@@ -1,23 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Download } from 'lucide-react';
-import { Item } from '@/types/config';
-import { exportToMarkdown } from '@/lib/config';
+import { Search, Filter } from 'lucide-react';
+import { Item, Config } from '@/types/config';
 import { useTheme } from './ThemeProvider';
 
 interface SearchFilterProps {
   items: Item[];
+  config?: Config;
   onFilter: (filteredItems: Item[]) => void;
-  exportTemplate?: string;
-  exportItemFormat?: string;
+  onSearchChange?: (query: string) => void;
+  onTagsChange?: (tags: string[]) => void;
 }
 
 export function SearchFilter({ 
   items, 
-  onFilter, 
-  exportTemplate, 
-  exportItemFormat 
+  config,
+  onFilter,
+  onSearchChange,
+  onTagsChange
 }: SearchFilterProps) {
   const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,11 +31,30 @@ export function SearchFilter({
     setMounted(true);
   }, []);
 
-  // 提取所有标签
+  // 提取所有标签并排序
   useEffect(() => {
     const tags = Array.from(new Set(items.flatMap(item => item.tags)));
-    setAllTags(tags.sort());
-  }, [items]);
+    
+    // 如果配置了pinnedTags，则按照pinnedTags的顺序排序
+    if (config?.layout.pinnedTags && config.layout.pinnedTags.length > 0) {
+      const pinnedTags = config.layout.pinnedTags;
+      
+      // 将标签分为置顶和非置顶两组
+      const pinned = tags.filter(tag => pinnedTags.includes(tag))
+        .sort((a, b) => {
+          // 按照pinnedTags中的顺序排序
+          return pinnedTags.indexOf(a) - pinnedTags.indexOf(b);
+        });
+      
+      const others = tags.filter(tag => !pinnedTags.includes(tag)).sort();
+      
+      // 合并两组标签
+      setAllTags([...pinned, ...others]);
+    } else {
+      // 没有配置pinnedTags，按字母顺序排序
+      setAllTags(tags.sort());
+    }
+  }, [items, config]);
 
   // 过滤项目
   useEffect(() => {
@@ -60,6 +80,15 @@ export function SearchFilter({
     onFilter(filtered);
   }, [searchQuery, selectedTags, items, onFilter]);
 
+  // 单独通知父组件搜索和标签变化
+  useEffect(() => {
+    if (onSearchChange) onSearchChange(searchQuery);
+  }, [searchQuery, onSearchChange]);
+
+  useEffect(() => {
+    if (onTagsChange) onTagsChange(selectedTags);
+  }, [selectedTags, onTagsChange]);
+
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
       prev.includes(tag)
@@ -71,42 +100,6 @@ export function SearchFilter({
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedTags([]);
-  };
-
-  const exportCurrentFilter = () => {
-    const filteredItems = items.filter(item => {
-      const matchesSearch = !searchQuery.trim() || 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesTags = selectedTags.length === 0 || 
-        selectedTags.some(tag => item.tags.includes(tag));
-      
-      return matchesSearch && matchesTags;
-    });
-
-    const tagName = selectedTags.length === 1 ? selectedTags[0] : '筛选结果';
-    const markdown = exportToMarkdown(
-      filteredItems,
-      undefined,
-      exportTemplate,
-      exportItemFormat
-    );
-
-    const content = selectedTags.length === 1 && exportTemplate
-      ? exportTemplate.replace('{tag}', tagName).replace('{items}', markdown)
-      : `# ${tagName}\n\n${markdown}`;
-
-    // 下载文件
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${tagName.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -134,27 +127,15 @@ export function SearchFilter({
           />
         </div>
         
-        <div className="flex gap-2">
-          {/* 导出按钮 */}
+        {/* 清除筛选按钮 */}
+        {(searchQuery || selectedTags.length > 0) && (
           <button
-            onClick={exportCurrentFilter}
-            className="px-4 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-xl transition-all flex items-center gap-2"
-            title="导出当前筛选结果"
+            onClick={clearFilters}
+            className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded-xl transition-all"
           >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">导出</span>
+            清除
           </button>
-          
-          {/* 清除筛选 */}
-          {(searchQuery || selectedTags.length > 0) && (
-            <button
-              onClick={clearFilters}
-              className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded-xl transition-all"
-            >
-              清除
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* 标签筛选 */}
@@ -166,6 +147,7 @@ export function SearchFilter({
         
         {allTags.map((tag) => {
           const isSelected = selectedTags.includes(tag);
+          const isPinned = config?.layout.pinnedTags?.includes(tag);
           const count = items.filter(item => item.tags.includes(tag)).length;
           
           return (
@@ -178,7 +160,7 @@ export function SearchFilter({
                 color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
                 borderWidth: '1px',
                 borderStyle: 'solid',
-                borderColor: isSelected ? 'var(--border-primary)' : 'transparent'
+                borderColor: isSelected ? 'var(--border-primary)' : (isPinned ? 'var(--border-secondary)' : 'transparent')
               }}
             >
               {tag}

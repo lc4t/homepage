@@ -27,17 +27,12 @@ export function ClientLayout({ children }: ClientLayoutProps) {
       if (theme === 'dark') {
         html.classList.add('dark');
         html.setAttribute('data-theme', 'dark');
-        console.log('ClientLayout: 已设置为暗色主题');
       } else {
         html.classList.remove('dark');
         html.setAttribute('data-theme', 'light');
-        console.log('ClientLayout: 已设置为亮色主题');
       }
-      
-      console.log('ClientLayout: 当前HTML类名', html.className);
-      console.log('ClientLayout: 当前data-theme', html.getAttribute('data-theme'));
     } catch (error) {
-      console.error('ClientLayout: 设置主题时出错', error);
+      // 静默处理错误
     }
   }, [theme, mounted]);
   

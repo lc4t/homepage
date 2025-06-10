@@ -4,6 +4,17 @@ site:
   description: "Personal Navigation Hub"
   author: "Your Name"
   analytics: "" # Google Analytics ID，留空则不启用
+  # 个人链接
+  links:
+    github: "https://github.com/yourusername"
+    blog: "https://yourblog.com"
+    custom:
+      - name: "Twitter"
+        url: "https://twitter.com/yourusername"
+        icon: "🐦"
+      - name: "LinkedIn"
+        url: "https://linkedin.com/in/yourusername"
+        icon: "💼"
 
 # 外观配置
 appearance:
@@ -13,7 +24,7 @@ appearance:
   background:
     type: "bing" # bing/color/image/url
     value: "today" # today/random 或者具体的日期索引
-    blur: 0 # 背景模糊程度 0-20
+    blur: 5 # 背景模糊程度 0-20
     opacity: 0.8 # 背景透明度 0-1
   card:
     blur: 10 # 卡片背景模糊 0-20
@@ -25,6 +36,12 @@ layout:
   pinned:
     - "claude-ai"
     - "github"
+  
+  # 置顶标签（标签筛选时优先显示）
+  pinnedTags:
+    - "ai"
+    - "dev"
+    - "service"
   
   # 自定义分组和排序
   groups:

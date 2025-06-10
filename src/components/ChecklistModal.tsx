@@ -36,7 +36,7 @@ export function ChecklistModal({ item, onClose }: ChecklistModalProps) {
   };
 
   // 导出为Markdown
-  const exportMarkdown = () => {
+  const exportMarkdown = async () => {
     if (!item) return;
 
     const completedItems = item.items.filter(subItem => 
@@ -62,16 +62,36 @@ ${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
 导出时间: ${new Date().toLocaleString()}
 `;
 
-    // 下载Markdown文件
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${item.title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // 复制到剪贴板
+    try {
+      await navigator.clipboard.writeText(markdown);
+      
+      // 显示成功提示
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg z-50';
+      toast.textContent = '已复制到剪贴板';
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => document.body.removeChild(toast), 500);
+      }, 2000);
+    } catch (err) {
+      console.error('复制到剪贴板失败:', err);
+      
+      // 显示错误提示
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg z-50';
+      toast.textContent = '复制失败，请手动复制';
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => document.body.removeChild(toast), 500);
+      }, 2000);
+    }
   };
 
   // 计算完成进度

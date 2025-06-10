@@ -4,6 +4,16 @@ export interface SiteConfig {
   description: string;
   author: string;
   analytics?: string;
+  // 个人链接
+  links?: {
+    github?: string;
+    blog?: string;
+    custom?: Array<{
+      name: string;
+      url: string;
+      icon?: string;
+    }>;
+  };
 }
 
 // 外观配置类型
@@ -27,6 +37,8 @@ export interface AppearanceConfig {
 // 布局配置类型
 export interface LayoutConfig {
   pinned: string[];
+  // 置顶标签（优先显示）
+  pinnedTags?: string[];
   groups: Array<{
     name: string;
     tags: string[];

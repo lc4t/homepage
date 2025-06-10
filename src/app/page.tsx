@@ -8,6 +8,7 @@ import { Header } from '@/components/Header';
 import { SearchFilter } from '@/components/SearchFilter';
 import { ItemGrid } from '@/components/ItemCard';
 import { ChecklistModal } from '@/components/ChecklistModal';
+import { FloatingExportButton } from '@/components/FloatingExportButton';
 import { useTheme } from '@/components/ThemeProvider';
 
 export default function HomePage() {
@@ -16,6 +17,8 @@ export default function HomePage() {
   const [selectedChecklist, setSelectedChecklist] = useState<ChecklistItemConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // 加载配置 - 只在组件挂载时执行
   useEffect(() => {
@@ -111,6 +114,14 @@ export default function HomePage() {
     setFilteredItems(sortedItems);
   }, [config]);
 
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  const handleTagsChange = useCallback((tags: string[]) => {
+    setSelectedTags(tags);
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -158,9 +169,10 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto">
             <SearchFilter
               items={config.items}
+              config={config}
               onFilter={handleFilter}
-              exportTemplate={config.export.markdown.template}
-              exportItemFormat={config.export.markdown.item_format}
+              onSearchChange={handleSearchChange}
+              onTagsChange={handleTagsChange}
             />
           </div>
         </div>
@@ -183,6 +195,15 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* 浮动导出按钮 */}
+      <FloatingExportButton 
+        items={config.items}
+        selectedTags={selectedTags}
+        searchQuery={searchQuery}
+        exportTemplate={config.export.markdown.template}
+        exportItemFormat={config.export.markdown.item_format}
+      />
 
       {/* 清单弹窗 */}
       <ChecklistModal 

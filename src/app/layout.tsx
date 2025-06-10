@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ThemeDebug } from "@/components/ThemeDebug";
 import { ClientLayout } from "@/components/ClientLayout";
 
 const inter = Inter({
@@ -33,7 +32,6 @@ export default function RootLayout({
         <ThemeProvider>
           <ClientLayout>
             {children}
-            <ThemeDebug />
           </ClientLayout>
         </ThemeProvider>
       </body>

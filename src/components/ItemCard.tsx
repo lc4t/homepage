@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Item, ServiceItem, Config } from '@/types/config';
-import { HealthChecker, ChecklistManager } from '@/lib/config';
+import { HealthChecker, ChecklistManager, getFaviconUrl } from '@/lib/config';
 import { CheckSquare } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
@@ -68,7 +68,7 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
   };
 
   // 渲染图标的函数
-  const renderIcon = () => {
+  const renderIcon = (item: Item, iconError: boolean, setIconError: (error: boolean) => void) => {
     // 如果有自定义图标且不是 URL，则显示为 emoji 或文本
     if (item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('/')) {
       return (
@@ -76,6 +76,23 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
           {item.icon}
         </div>
       );
+    }
+    
+    // 如果是网站或服务类型，尝试获取favicon
+    if ((item.type === 'website' || item.type === 'service') && 'url' in item) {
+      // 使用自定义图标或尝试获取favicon
+      const iconUrl = item.icon || getFaviconUrl(item.url);
+      
+      if (!iconError) {
+        return (
+          <img 
+            src={iconUrl}
+            alt={item.title}
+            className="w-8 h-8 rounded-lg object-cover"
+            onError={() => setIconError(true)}
+          />
+        );
+      }
     }
     
     // 如果有自定义图标且是 URL且没有加载错误
@@ -112,7 +129,7 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
         {/* 图标和标题并排 */}
         <div className="flex items-center mb-3">
           <div className="mr-3">
-            {renderIcon()}
+            {renderIcon(item, iconError, setIconError)}
           </div>
           
           <h3 className="text-white font-medium text-sm flex-grow" style={{color: 'var(--text-primary)'}}>
@@ -198,6 +215,7 @@ export function ItemGrid({ items, onOpenChecklist, className = '', config }: Ite
       let priority = 999; // 默认优先级最低
       
       // 如果配置文件中有定义，则使用配置文件中的值
+      // 注意：typeGroups用于按类型分组，而groups用于按标签分组
       if (config?.layout.typeGroups && config.layout.typeGroups[type]) {
         title = config.layout.typeGroups[type].title || title;
         priority = config.layout.typeGroups[type].priority || priority;

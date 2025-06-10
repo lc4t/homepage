@@ -86,6 +86,49 @@ appearance:
     opacity: 0.1 # 卡片不透明度
 ```
 
+### 布局配置
+
+```yaml
+layout:
+  # 置顶项目（显示在最前面）
+  pinned:
+    - "github"
+    - "gmail"
+  
+  # 置顶标签（标签筛选时优先显示）
+  pinnedTags:
+    - "ai"
+    - "dev"
+    - "service"
+  
+  # 自定义标签分组（按标签对项目分组）
+  groups:
+    - name: "AI工具"
+      tags: ["ai", "tool"]
+      priority: 1
+    - name: "开发工具"
+      tags: ["dev", "tool"]
+      priority: 2
+  
+  # 类型分组配置（按类型对项目分组）
+  typeGroups:
+    website:
+      title: "常用网站"
+      priority: 1
+    service:
+      title: "服务监控"
+      priority: 2
+    checklist:
+      title: "任务清单"
+      priority: 3
+```
+
+说明：
+- `pinned`: 置顶项目，这些项目会显示在最前面
+- `pinnedTags`: 置顶标签，这些标签会在筛选栏中优先显示
+- `groups`: 按标签对项目进行分组（用于未来功能）
+- `typeGroups`: 按类型对项目进行分组（当前用于主页显示）
+
 ### 添加项目
 
 #### 网站项目

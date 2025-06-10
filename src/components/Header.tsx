@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Sunrise } from 'lucide-react';
+import { Sun, Moon, Sunrise, Github, Globe, ExternalLink } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { SiteConfig } from '@/types/config';
 
@@ -57,23 +57,76 @@ export function Header({ siteConfig }: HeaderProps) {
       }`
     : 'p-3 rounded-xl backdrop-blur-[10px] border transition-all bg-white/10 border-white/20';
 
+  // 渲染个人链接图标
+  const renderLinks = () => {
+    if (!siteConfig.links) return null;
+    
+    return (
+      <div className="flex items-center gap-2 ml-4">
+        {siteConfig.links.github && (
+          <a 
+            href={siteConfig.links.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/70 hover:text-white transition-colors"
+            title="GitHub"
+          >
+            <Github className="w-4 h-4 sm:w-5 sm:h-5" />
+          </a>
+        )}
+        
+        {siteConfig.links.blog && (
+          <a 
+            href={siteConfig.links.blog}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/70 hover:text-white transition-colors"
+            title="博客"
+          >
+            <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+          </a>
+        )}
+        
+        {siteConfig.links.custom?.map((link, index) => (
+          <a 
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/70 hover:text-white transition-colors"
+            title={link.name}
+          >
+            {link.icon ? (
+              <span className="text-base sm:text-lg">{link.icon}</span>
+            ) : (
+              <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+            )}
+          </a>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <header className="relative z-20 p-6">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center">
         {/* 网站信息 */}
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-1" style={{color: 'var(--text-primary)'}}>
+        <div className="flex-1 mb-4 sm:mb-0">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{color: 'var(--text-primary)'}}>
             {siteConfig.title}
           </h1>
-          {siteConfig.description && (
-            <p className="text-sm" style={{color: 'var(--text-secondary)'}}>
-              {siteConfig.description}
-            </p>
-          )}
+          <div className="flex flex-wrap items-center">
+            {siteConfig.description && (
+              <p className="text-xs sm:text-sm mr-2" style={{color: 'var(--text-secondary)'}}>
+                {siteConfig.description}
+              </p>
+            )}
+            {renderLinks()}
+          </div>
         </div>
 
-        {/* 操作按钮 */}
-        <div className="flex items-center gap-3">
+        {/* 操作按钮 - 在移动端隐藏 */}
+        <div className="hidden md:flex items-center gap-3">
           {/* 主题切换按钮 */}
           <button
             onClick={handleThemeClick}
@@ -86,17 +139,10 @@ export function Header({ siteConfig }: HeaderProps) {
         </div>
       </div>
 
-      {/* 主题提示 */}
+      {/* 主题提示 - 在移动端隐藏 */}
       {mounted && autoTheme && (
-        <div className="absolute top-20 right-6 bg-orange-500/20 backdrop-blur-[10px] border border-orange-500/30 rounded-lg px-3 py-2 text-orange-200 text-sm">
+        <div className="absolute top-20 right-6 bg-orange-500/20 backdrop-blur-[10px] border border-orange-500/30 rounded-lg px-3 py-2 text-orange-200 text-sm hidden md:block">
           🌅 自动主题模式
-        </div>
-      )}
-      
-      {/* 当前主题状态显示 */}
-      {mounted && (
-        <div className="absolute top-2 right-2 bg-blue-500/30 backdrop-blur-[10px] border border-blue-500/50 rounded px-2 py-1 text-blue-200 text-xs">
-          {theme === 'dark' ? '🌙 深色' : '☀️ 浅色'}
         </div>
       )}
     </header>
