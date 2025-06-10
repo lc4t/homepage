@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
   // 禁用图片优化（静态导出不支持）
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cn.bing.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'bing.img.run',
+        pathname: '/**',
+      },
+    ],
   },
   
   // 禁用服务端功能

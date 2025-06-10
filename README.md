@@ -4,15 +4,18 @@
 
 ## ✨ 特性
 
-- 🌓 **智能主题**：根据时间自动切换深色/浅色主题
-- 🎨 **自定义背景**：支持 Unsplash 图片、自定义图片、纯色背景
-- 📱 **响应式设计**：完美适配桌面、平板、手机
-- 🔍 **智能搜索**：支持标题、描述、标签搜索和筛选
+- 🚀 **极速加载**：基于Next.js构建，支持静态导出
+- 🌙 **自动深色模式**：根据时间自动切换主题
+- 🎨 **自定义背景**：支持Bing今日图片、自定义图片、纯色背景
+- 🔍 **快速搜索**：支持快捷键搜索（按下 `/` 键）
+- 📱 **响应式设计**：完美适配各种设备
+- 🔧 **简单配置**：通过YAML文件轻松配置
+- 🔄 **健康检查**：监控服务状态
+- ✅ **待办清单**：支持简单的待办事项管理
 - 📊 **服务监控**：实时检查内网服务状态
 - ✅ **清单管理**：支持 TODO 清单，可导出 Markdown
 - 📤 **一键导出**：支持按标签导出项目为 Markdown
 - ⚡ **毛玻璃效果**：现代化的 UI 设计
-- 🔧 **YAML 配置**：简单易用的配置文件
 
 ## 🚀 快速开始
 
@@ -64,23 +67,23 @@
 编辑 `public/config/site.yaml` 文件：
 
 ```yaml
-# 网站基本信息
 site:
-  title: "我的导航站"
-  description: "Personal Navigation Hub"
-  author: "Your Name"
-  analytics: "G-XXXXXXXXXX" # Google Analytics ID
+  title: "我的导航站" # 网站标题
+  description: "Personal Navigation Hub" # 网站描述
+  author: "Your Name" # 作者名称
 
-# 外观配置
 appearance:
   theme:
-    auto: true # 自动切换主题
-    default: "light" # 默认主题
+    auto: true # 是否根据时间自动切换主题
+    default: "light" # 默认主题：light/dark
   background:
-    type: "unsplash" # 背景类型
-    value: "landscape" # 背景值
+    type: "bing" # 背景类型
+    value: "today" # 背景值
     blur: 0 # 背景模糊度
-    opacity: 0.8 # 背景透明度
+    opacity: 0.8 # 背景不透明度
+  card:
+    blur: 10 # 卡片模糊度
+    opacity: 0.1 # 卡片不透明度
 ```
 
 ### 添加项目
@@ -196,11 +199,10 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ## 🙏 致谢
 
-- [Next.js](https://nextjs.org/) - React 框架
-- [Tailwind CSS](https://tailwindcss.com/) - CSS 框架
-- [Lucide](https://lucide.dev/) - 图标库
-- [Unsplash](https://unsplash.com/) - 免费图片
-- [Framer Motion](https://www.framer.com/motion/) - 动画库
+- [Next.js](https://nextjs.org/) - React框架
+- [Tailwind CSS](https://tailwindcss.com/) - CSS框架
+- [Lucide Icons](https://lucide.dev/) - 图标库
+- [Bing](https://www.bing.com/) - 每日图片
 
 ---
 

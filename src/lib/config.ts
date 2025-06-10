@@ -114,41 +114,6 @@ export function getFaviconUrl(url: string, fallback?: string): string {
   }
 }
 
-// 获取Bing每日壁纸
-export async function getBingBackground(option: string = 'today'): Promise<string> {
-  const idx = option === 'today' ? 0 : option === 'random' ? Math.floor(Math.random() * 7) : parseInt(option) || 0;
-  
-  try {
-    // 使用 Bing 官方 API
-    const response = await fetch(`https://cn.bing.com/HPImageArchive.aspx?format=js&idx=${idx}&n=1`);
-    
-    if (!response.ok) {
-      throw new Error('Bing API 请求失败');
-    }
-    
-    const data = await response.json();
-    
-    if (data.images && data.images.length > 0) {
-      const imageUrl = data.images[0].url;
-      // Bing 返回的是相对路径，需要加上域名
-      return imageUrl.startsWith('http') ? imageUrl : `https://cn.bing.com${imageUrl}`;
-    }
-    
-    throw new Error('没有获取到壁纸数据');
-  } catch (error) {
-    console.error('Bing 官方 API 失败:', error);
-    
-    // 备用方案：使用第三方 API
-    const fallbackImages = [
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop',
-      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&h=1080&fit=crop',
-      'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1920&h=1080&fit=crop',
-      'https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?w=1920&h=1080&fit=crop',
-    ];
-    return fallbackImages[idx % fallbackImages.length];
-  }
-}
-
 // 根据时间判断是否应该使用深色主题
 export function shouldUseDarkTheme(): boolean {
   const hour = new Date().getHours();

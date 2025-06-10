@@ -28,12 +28,43 @@ site:
 ```
 
 ### 背景设置
+
+背景支持以下几种类型：
+
 ```yaml
 appearance:
   background:
-    type: "unsplash"           # 使用 Unsplash 图片
-    value: "landscape,nature"  # 搜索关键词
-    opacity: 0.8              # 透明度
+    type: "bing"           # 使用 Bing 今日图片
+    value: "today"         # today, random, 或者数字索引 0-6
+    blur: 0                # 模糊度 0-20
+    opacity: 0.8           # 不透明度 0-1
+```
+
+```yaml
+appearance:
+  background:
+    type: "color"          # 使用纯色背景
+    value: "#667eea"       # 颜色值
+    blur: 0                # 模糊度 0-20
+    opacity: 0.8           # 不透明度 0-1
+```
+
+```yaml
+appearance:
+  background:
+    type: "image"          # 使用本地图片
+    value: "/bg.jpg"       # 图片路径（放在 public 文件夹下）
+    blur: 0                # 模糊度 0-20
+    opacity: 0.8           # 不透明度 0-1
+```
+
+```yaml
+appearance:
+  background:
+    type: "url"            # 使用网络图片
+    value: "https://example.com/image.jpg"  # 图片URL
+    blur: 0                # 模糊度 0-20
+    opacity: 0.8           # 不透明度 0-1
 ```
 
 ### 添加网站
@@ -111,10 +142,13 @@ npm run preview
 ## 自定义配置
 
 ### 背景类型
-- `unsplash`: Unsplash 图片
-- `color`: 纯色背景
-- `url`: 网络图片 URL
-- `image`: 本地图片路径
+- `bing`: Bing 今日图片，value可以是：
+  - `today`: 今日图片
+  - `random`: 随机图片
+  - `0`-`6`: 特定索引的图片
+- `color`: 纯色背景，value为颜色值，如 `#667eea`
+- `image`: 本地图片，value为图片路径，如 `/bg.jpg`
+- `url`: 网络图片，value为图片URL
 
 ### 项目类型
 - `website`: 普通网站链接

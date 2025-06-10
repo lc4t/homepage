@@ -11,7 +11,7 @@ appearance:
     auto: true # 是否根据时间自动切换主题
     default: "light" # 默认主题：light/dark
   background:
-    type: "bing" # bing/unsplash/color/image/url
+    type: "bing" # bing/color/image/url
     value: "today" # today/random 或者具体的日期索引
     blur: 0 # 背景模糊程度 0-20
     opacity: 0.8 # 背景透明度 0-1
@@ -269,11 +269,11 @@ items:
     tags: ["design", "tool"]
     icon: "🎯"
 
-  - id: "unsplash"
+  - id: "bing"
     type: "website"
-    title: "Unsplash"
-    url: "https://unsplash.com"
-    description: "免费高质量图片库"
+    title: "Bing"
+    url: "https://www.bing.com"
+    description: "微软搜索引擎和每日精美壁纸"
     tags: ["design", "photo"]
     icon: "📸"
 

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeDebug } from "@/components/ThemeDebug";
+import { ClientLayout } from "@/components/ClientLayout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +31,10 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full">
       <body className={`${inter.variable} font-sans antialiased h-full`}>
         <ThemeProvider>
-          {children}
+          <ClientLayout>
+            {children}
+            <ThemeDebug />
+          </ClientLayout>
         </ThemeProvider>
       </body>
     </html>

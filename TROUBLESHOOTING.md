@@ -67,3 +67,12 @@ rm -rf .next node_modules out
 npm install
 npm run dev
 ```
+
+## 背景问题
+
+### 背景图片不显示
+
+- 检查网络连接
+- Bing图片需要网络连接
+- 如果使用本地图片，确保图片路径正确且图片放在`public`文件夹下
+- 尝试使用纯色背景作为替代方案

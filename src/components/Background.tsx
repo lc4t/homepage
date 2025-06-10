@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { AppearanceConfig } from '@/types/config';
-import { getUnsplashBackground } from '@/lib/config';
 
 interface BackgroundProps {
   config: AppearanceConfig['background'];
@@ -11,14 +10,17 @@ interface BackgroundProps {
 export function Background({ config }: BackgroundProps) {
   const [backgroundUrl, setBackgroundUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
     const loadBackground = async () => {
       let url = '';
+      setUseFallback(false);
 
       switch (config.type) {
-        case 'unsplash':
-          url = getUnsplashBackground(config.value);
+        case 'bing':
+          // 使用第三方服务获取Bing每日壁纸
+          url = 'https://bing.img.run/1920x1080.php';
           break;
         case 'url':
           url = config.value;
@@ -31,8 +33,10 @@ export function Background({ config }: BackgroundProps) {
           setIsLoaded(true);
           return;
         default:
-          // 默认使用Unsplash风景图
-          url = getUnsplashBackground('landscape,nature');
+          // 默认使用渐变背景
+          setUseFallback(true);
+          setIsLoaded(true);
+          return;
       }
 
       if (url) {
@@ -43,13 +47,14 @@ export function Background({ config }: BackgroundProps) {
           setIsLoaded(true);
         };
         img.onerror = () => {
-          // 图片加载失败，使用默认背景
-          const fallbackUrl = getUnsplashBackground('abstract,minimal');
-          setBackgroundUrl(fallbackUrl);
+          // 图片加载失败，使用备用渐变背景
+          console.error('图片加载失败:', url);
+          setUseFallback(true);
           setIsLoaded(true);
         };
         img.src = url;
       } else {
+        setUseFallback(true);
         setIsLoaded(true);
       }
     };
@@ -58,6 +63,13 @@ export function Background({ config }: BackgroundProps) {
   }, [config]);
 
   const getBackgroundStyle = () => {
+    if (useFallback) {
+      // 备用渐变背景
+      return {
+        background: 'linear-gradient(-45deg, #667eea 0%, #764ba2 100%)',
+      };
+    }
+
     if (config.type === 'color') {
       return {
         backgroundColor: config.value,
@@ -109,19 +121,6 @@ export function Background({ config }: BackgroundProps) {
 
 // 预设背景配置
 export const BACKGROUND_PRESETS = {
-  landscapes: [
-    'landscape,mountain',
-    'landscape,ocean',
-    'landscape,forest',
-    'landscape,sunset',
-    'landscape,field',
-  ],
-  abstract: [
-    'abstract,geometric',
-    'abstract,minimal',
-    'abstract,gradient',
-    'abstract,texture',
-  ],
   colors: [
     '#667eea',
     '#764ba2',
@@ -145,8 +144,8 @@ export function BackgroundSelector({ current, onChange }: BackgroundSelectorProp
     let defaultValue = '';
     
     switch (type) {
-      case 'unsplash':
-        defaultValue = 'landscape';
+      case 'bing':
+        defaultValue = 'today';
         break;
       case 'color':
         defaultValue = '#667eea';
@@ -177,7 +176,7 @@ export function BackgroundSelector({ current, onChange }: BackgroundSelectorProp
     <div className="space-y-4">
       {/* 背景类型选择 */}
       <div className="flex gap-2 flex-wrap">
-        {(['unsplash', 'color', 'url', 'image'] as const).map((type) => (
+        {(['bing', 'color', 'url', 'image'] as const).map((type) => (
           <button
             key={type}
             onClick={() => handleTypeChange(type)}
@@ -189,7 +188,7 @@ export function BackgroundSelector({ current, onChange }: BackgroundSelectorProp
               }
             `}
           >
-            {type === 'unsplash' && 'Unsplash图片'}
+            {type === 'bing' && 'Bing今日图片'}
             {type === 'color' && '纯色背景'}
             {type === 'url' && '网络图片'}
             {type === 'image' && '本地图片'}
@@ -204,30 +203,19 @@ export function BackgroundSelector({ current, onChange }: BackgroundSelectorProp
           value={customValue}
           onChange={(e) => handleValueChange(e.target.value)}
           placeholder={
-            current.type === 'unsplash' ? '输入关键词，如: landscape, abstract' :
             current.type === 'color' ? '输入颜色值，如: #667eea' :
             current.type === 'url' ? '输入图片URL' :
             '输入图片路径'
           }
           className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
+          disabled={current.type === 'bing'}
         />
       </div>
 
       {/* 预设选项 */}
-      {current.type === 'unsplash' && (
-        <div className="space-y-2">
-          <div className="text-white/70 text-sm">风景预设:</div>
-          <div className="flex gap-2 flex-wrap">
-            {BACKGROUND_PRESETS.landscapes.map((preset) => (
-              <button
-                key={preset}
-                onClick={() => handleValueChange(preset)}
-                className="px-2 py-1 bg-white/10 hover:bg-white/15 text-white/80 rounded text-xs transition-all"
-              >
-                {preset}
-              </button>
-            ))}
-          </div>
+      {current.type === 'bing' && (
+        <div className="p-3 bg-white/5 rounded-lg">
+          <div className="text-white/80">使用Bing今日壁纸，无需设置参数</div>
         </div>
       )}
 

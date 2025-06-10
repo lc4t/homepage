@@ -6,7 +6,7 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: 'class', // 启用class模式的dark主题
+  darkMode: ['class', '[data-theme="dark"]'], // 使用多种选择器
   theme: {
     extend: {
       colors: {

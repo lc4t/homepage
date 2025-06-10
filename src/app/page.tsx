@@ -8,6 +8,7 @@ import { Header } from '@/components/Header';
 import { SearchFilter } from '@/components/SearchFilter';
 import { ItemGrid } from '@/components/ItemCard';
 import { ChecklistModal } from '@/components/ChecklistModal';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function HomePage() {
   const [config, setConfig] = useState<Config | null>(null);
@@ -141,12 +142,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen relative">
+    <main className="min-h-screen relative">
       {/* 背景 */}
       <Background config={config.appearance.background} />
-
-      {/* 主内容 */}
-      <div className="relative z-10 min-h-screen">
+      
+      {/* 内容区域 */}
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* 头部 */}
         <Header 
           siteConfig={config.site}
@@ -207,6 +208,6 @@ export default function HomePage() {
           />
         </>
       )}
-    </div>
+    </main>
   );
 }

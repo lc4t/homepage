@@ -33,64 +33,85 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>(defaultTheme);
   const [auto, setAuto] = useState(autoTheme);
+  const [initialized, setInitialized] = useState(false);
 
-  // 初始化主题
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return;
+    
+    try {
       const saved = localStorage.getItem('homepage-theme');
       const savedAuto = localStorage.getItem('homepage-auto-theme');
       
-      if (saved) {
-        setTheme(saved as 'light' | 'dark');
+      if (saved && (saved === 'light' || saved === 'dark')) {
+        console.log('ThemeProvider: 从localStorage加载主题', saved);
+        setTheme(saved);
       }
       
       if (savedAuto !== null) {
         setAuto(savedAuto === 'true');
       }
+      
+      setInitialized(true);
+    } catch (error) {
+      console.error('ThemeProvider: 初始化主题时出错', error);
     }
   }, []);
 
-  // 自动主题切换
   useEffect(() => {
-    if (!auto) return;
+    if (!auto || !initialized) return;
 
     const updateTheme = () => {
-      const shouldBeDark = shouldUseDarkTheme();
-      setTheme(shouldBeDark ? 'dark' : 'light');
+      try {
+        const shouldBeDark = shouldUseDarkTheme();
+        console.log('ThemeProvider: 自动主题检测结果', shouldBeDark ? 'dark' : 'light');
+        setTheme(shouldBeDark ? 'dark' : 'light');
+      } catch (error) {
+        console.error('ThemeProvider: 自动主题检测出错', error);
+      }
     };
 
     updateTheme();
     
-    // 每分钟检查一次
     const interval = setInterval(updateTheme, 60000);
     return () => clearInterval(interval);
-  }, [auto]);
+  }, [auto, initialized]);
 
-  // 应用主题到DOM
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+    if (typeof window === 'undefined' || !initialized) return;
+    
+    try {
       localStorage.setItem('homepage-theme', theme);
+      console.log('ThemeProvider: 主题已保存为', theme);
+    } catch (error) {
+      console.error('ThemeProvider: 保存主题时出错', error);
     }
-  }, [theme]);
+  }, [theme, initialized]);
 
-  // 保存自动主题设置
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined' || !initialized) return;
+    
+    try {
       localStorage.setItem('homepage-auto-theme', auto.toString());
+    } catch (error) {
+      console.error('ThemeProvider: 保存自动主题设置时出错', error);
     }
-  }, [auto]);
+  }, [auto, initialized]);
 
   const toggleTheme = () => {
+    console.log('ThemeProvider: 手动切换主题', theme === 'light' ? 'dark' : 'light');
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
-    setAuto(false); // 手动切换时关闭自动模式
+    setAuto(false);
   };
 
   const setAutoTheme = (autoMode: boolean) => {
     setAuto(autoMode);
     if (autoMode) {
-      const shouldBeDark = shouldUseDarkTheme();
-      setTheme(shouldBeDark ? 'dark' : 'light');
+      try {
+        const shouldBeDark = shouldUseDarkTheme();
+        setTheme(shouldBeDark ? 'dark' : 'light');
+      } catch (error) {
+        console.error('ThemeProvider: 设置自动主题时出错', error);
+      }
     }
   };
 

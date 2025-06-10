@@ -20,8 +20,8 @@ export function SettingsModal({ isOpen, onClose, currentConfig, onSaveConfig }: 
   const [activeTab, setActiveTab] = useState<'theme' | 'background' | 'export'>('theme');
   const [backgroundConfig, setBackgroundConfig] = useState(
     currentConfig?.appearance.background || {
-      type: 'unsplash' as const,
-      value: 'landscape',
+      type: 'bing' as const,
+      value: 'today',
       blur: 0,
       opacity: 0.8,
     }

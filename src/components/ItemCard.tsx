@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Item, ServiceItem } from '@/types/config';
 import { HealthChecker, ChecklistManager } from '@/lib/config';
 import { ExternalLink, Clock, CheckSquare } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
 
 interface ItemCardProps {
   item: Item;
@@ -12,8 +13,15 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProps) {
+  const { theme } = useTheme();
   const [progress, setProgress] = useState<{completed: number; total: number} | null>(null);
   const [iconError, setIconError] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  // 客户端挂载检测
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // 获取清单进度
   useEffect(() => {
@@ -90,17 +98,52 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
     );
   };
 
-  return (
-    <div 
-      className={`
-        group relative bg-white/10 dark:bg-white/5 backdrop-blur-[10px] 
-        border border-white/20 dark:border-white/10 rounded-xl p-4
-        hover:bg-white/15 dark:hover:bg-white/10 
+  // 在服务器端或客户端首次渲染时使用基本样式
+  const cardStyle = mounted 
+    ? `
+        group relative 
+        ${theme === 'dark' 
+          ? 'bg-white/5 border-white/10 hover:bg-white/10' 
+          : 'bg-white/10 border-white/20 hover:bg-white/15'
+        }
+        backdrop-blur-[10px] border rounded-xl p-4
         hover:-translate-y-1 hover:shadow-lg hover:shadow-black/10
         transition-all duration-300 cursor-pointer
         ${className}
-      `}
+      `
+    : `
+        group relative 
+        bg-white/10 border-white/20
+        backdrop-blur-[10px] border rounded-xl p-4
+        transition-all duration-300 cursor-pointer
+        ${className}
+      `;
+
+  const tagStyle = (index: number) => {
+    if (!mounted) return "px-2 py-0.5 bg-white/10 text-white/80 text-xs rounded-md";
+    
+    return `
+      px-2 py-0.5 text-xs rounded-md
+      ${theme === 'dark' 
+        ? 'bg-white/20 text-white/90' 
+        : 'bg-white/10 text-white/80'
+      }
+    `;
+  };
+
+  const extraTagsStyle = mounted && theme === 'dark' 
+    ? 'text-xs text-white/60' 
+    : 'text-xs text-white/50';
+
+  const progressStyle = mounted && theme === 'dark' 
+    ? 'text-xs text-white/70' 
+    : 'text-xs text-white/60';
+
+  return (
+    <div 
+      className={cardStyle}
       onClick={handleClick}
+      data-theme={mounted ? theme : undefined}
     >
       {/* 图标和状态 */}
       <div className="flex items-start justify-between mb-3">
@@ -135,18 +178,20 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
           {item.tags.slice(0, 2).map((tag, index) => (
             <span 
               key={index}
-              className="px-2 py-0.5 bg-white/10 dark:bg-white/20 text-white/80 dark:text-white/90 text-xs rounded-md"
+              className={tagStyle(index)}
             >
               {tag}
             </span>
           ))}
           {item.tags.length > 2 && (
-            <span className="text-white/50 dark:text-white/60 text-xs">+{item.tags.length - 2}</span>
+            <span className={extraTagsStyle}>
+              +{item.tags.length - 2}
+            </span>
           )}
         </div>
 
         {/* 进度或其他信息 */}
-        <div className="text-white/60 dark:text-white/70 text-xs">
+        <div className={progressStyle}>
           {getProgressInfo()}
         </div>
       </div>

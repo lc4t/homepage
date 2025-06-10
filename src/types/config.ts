@@ -13,7 +13,7 @@ export interface AppearanceConfig {
     default: 'light' | 'dark';
   };
   background: {
-    type: 'bing' | 'unsplash' | 'color' | 'image' | 'url';
+    type: 'bing' | 'color' | 'image' | 'url';
     value: string;
     blur: number;
     opacity: number;
