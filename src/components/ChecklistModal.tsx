@@ -1,0 +1,192 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { ChecklistItemConfig, ChecklistItem as ChecklistItemType } from '@/types/config';
+import { ChecklistManager, exportToMarkdown } from '@/lib/config';
+import { X, Download, Check } from 'lucide-react';
+
+interface ChecklistModalProps {
+  item: ChecklistItemConfig | null;
+  onClose: () => void;
+}
+
+export function ChecklistModal({ item, onClose }: ChecklistModalProps) {
+  const [checklistState, setChecklistState] = useState<Record<string, boolean>>({});
+
+  // 加载清单状态
+  useEffect(() => {
+    if (item) {
+      const state = ChecklistManager.getState();
+      setChecklistState(state[item.id] || {});
+    }
+  }, [item]);
+
+  // 关闭弹窗
+  const handleClose = () => {
+    onClose();
+  };
+
+  // 切换清单项状态
+  const toggleItem = (checklistItemId: string) => {
+    if (!item) return;
+    
+    ChecklistManager.toggleItem(item.id, checklistItemId);
+    const newState = ChecklistManager.getState();
+    setChecklistState(newState[item.id] || {});
+  };
+
+  // 导出为Markdown
+  const exportMarkdown = () => {
+    if (!item) return;
+
+    const completedItems = item.items.filter(subItem => 
+      checklistState[subItem.id]
+    );
+    const pendingItems = item.items.filter(subItem => 
+      !checklistState[subItem.id]
+    );
+
+    const markdown = `# ${item.title}
+
+${item.description}
+
+## 已完成 (${completedItems.length}/${item.items.length})
+
+${completedItems.map(subItem => `- [x] ${subItem.text}`).join('\n')}
+
+## 待完成 (${pendingItems.length}/${item.items.length})
+
+${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
+
+---
+导出时间: ${new Date().toLocaleString()}
+`;
+
+    // 下载Markdown文件
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${item.title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // 计算完成进度
+  const getProgress = () => {
+    if (!item) return { completed: 0, total: 0, percentage: 0 };
+    
+    const completed = item.items.filter(subItem => 
+      checklistState[subItem.id]
+    ).length;
+    const total = item.items.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    return { completed, total, percentage };
+  };
+
+  if (!item) return null;
+
+  const progress = getProgress();
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div 
+        className="fixed inset-0" 
+        onClick={handleClose}
+      />
+      
+      <div className="relative bg-white/10 dark:bg-white/5 backdrop-blur-[20px] border border-white/20 dark:border-white/10 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+        {/* 头部 */}
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold text-white mb-2">
+                {item.title}
+              </h2>
+              <p className="text-white/70 text-sm mb-3">
+                {item.description}
+              </p>
+              
+              {/* 进度条 */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300"
+                    style={{ width: `${progress.percentage}%` }}
+                  />
+                </div>
+                <span className="text-white/80 text-sm font-medium min-w-fit">
+                  {progress.completed}/{progress.total}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 ml-4">
+              <button
+                onClick={exportMarkdown}
+                className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-lg transition-all"
+                title="导出 Markdown"
+              >
+                <Download className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleClose}
+                className="p-2 hover:bg-white/10 text-white/70 hover:text-white rounded-lg transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 清单内容 */}
+        <div className="p-6 overflow-y-auto max-h-96">
+          <div className="space-y-2">
+            {item.items.map((checklistItem) => {
+              const isCompleted = checklistState[checklistItem.id] || false;
+              
+              return (
+                <div 
+                  key={checklistItem.id}
+                  className={`
+                    flex items-center gap-3 p-3 rounded-lg transition-all cursor-pointer
+                    hover:bg-white/5 dark:hover:bg-white/10 ${isCompleted ? 'opacity-75' : ''}
+                  `}
+                  onClick={() => toggleItem(checklistItem.id)}
+                >
+                  <div className={`
+                    w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                    ${isCompleted 
+                      ? 'bg-green-500 border-green-500' 
+                      : 'border-white/30 hover:border-white/50'
+                    }
+                  `}>
+                    {isCompleted && (
+                      <Check className="w-3 h-3 text-white" />
+                    )}
+                  </div>
+                  
+                  <span className={`
+                    text-white transition-all flex-1
+                    ${isCompleted ? 'line-through opacity-60' : ''}
+                  `}>
+                    {checklistItem.text}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {item.items.length === 0 && (
+            <div className="text-center text-white/50 py-8">
+              暂无清单项目
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

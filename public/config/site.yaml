@@ -1,0 +1,312 @@
+# 完整测试配置 - 包含各种类型和功能测试
+site:
+  title: "我的导航站"
+  description: "Personal Navigation Hub"
+  author: "Your Name"
+  analytics: "" # Google Analytics ID，留空则不启用
+
+# 外观配置
+appearance:
+  theme:
+    auto: true # 是否根据时间自动切换主题
+    default: "light" # 默认主题：light/dark
+  background:
+    type: "bing" # bing/unsplash/color/image/url
+    value: "today" # today/random 或者具体的日期索引
+    blur: 0 # 背景模糊程度 0-20
+    opacity: 0.8 # 背景透明度 0-1
+  card:
+    blur: 10 # 卡片背景模糊 0-20
+    opacity: 0.15 # 卡片透明度 0-1
+
+# 布局配置
+layout:
+  # 置顶项目（显示在最前面）
+  pinned:
+    - "claude-ai"
+    - "github"
+  
+  # 自定义分组和排序
+  groups:
+    - name: "AI工具"
+      tags: ["ai", "tool"]
+      priority: 1
+    - name: "开发工具"
+      tags: ["dev", "tool"]
+      priority: 2
+    - name: "服务监控"
+      tags: ["service", "monitor"]
+      priority: 3
+    - name: "个人清单"
+      tags: ["personal", "list"]
+      priority: 4
+
+# 导出配置
+export:
+  markdown:
+    # 按标签导出时的模板
+    template: |
+      ## {tag}
+      
+      {items}
+    # 单个项目的格式
+    item_format: "- [{title}]({url}) - {description}"
+
+# 完整测试项目配置
+items:
+  # AI 工具类
+  - id: "claude-ai"
+    type: "website"
+    title: "Claude"
+    url: "https://claude.ai"
+    description: "Anthropic 开发的AI助手，擅长写作、编程和分析"
+    tags: ["ai", "tool"]
+    icon: "🤖"
+
+  - id: "chatgpt"
+    type: "website"
+    title: "ChatGPT"
+    url: "https://chat.openai.com"
+    description: "OpenAI 开发的对话AI，功能强大"
+    tags: ["ai", "tool"]
+    icon: "💬"
+
+  - id: "midjourney"
+    type: "website"
+    title: "Midjourney"
+    url: "https://www.midjourney.com"
+    description: "AI图像生成工具，创作精美艺术作品"
+    tags: ["ai", "tool", "art"]
+    icon: "🎨"
+
+  # 开发工具类
+  - id: "github"
+    type: "website"
+    title: "GitHub"
+    url: "https://github.com"
+    description: "代码托管和协作平台"
+    tags: ["dev", "tool"]
+    icon: "💻"
+
+  - id: "vercel"
+    type: "website"
+    title: "Vercel"
+    url: "https://vercel.com"
+    description: "现代化的前端部署平台"
+    tags: ["dev", "tool", "deploy"]
+    icon: "⚡"
+
+  - id: "vscode"
+    type: "website"
+    title: "VS Code"
+    url: "https://code.visualstudio.com"
+    description: "强大的代码编辑器"
+    tags: ["dev", "tool", "editor"]
+    icon: "📝"
+
+  # 服务监控类（带健康检查）
+  - id: "nas-server"
+    type: "service"
+    title: "NAS服务器"
+    url: "http://192.168.1.100:5000"
+    description: "Synology NAS 管理界面"
+    tags: ["service", "monitor", "nas"]
+    icon: "🖥️"
+    healthCheck:
+      enabled: true
+      type: "http"
+      url: "http://192.168.1.100:5000"
+      interval: 60
+      timeout: 5
+
+  - id: "home-assistant"
+    type: "service"
+    title: "Home Assistant"
+    url: "http://192.168.1.101:8123"
+    description: "智能家居控制中心"
+    tags: ["service", "monitor", "smart-home"]
+    icon: "🏠"
+    healthCheck:
+      enabled: true
+      type: "http"
+      url: "http://192.168.1.101:8123"
+      interval: 60
+      timeout: 5
+
+  - id: "plex-server"
+    type: "service"
+    title: "Plex Media Server"
+    url: "http://192.168.1.100:32400"
+    description: "家庭媒体服务器"
+    tags: ["service", "monitor", "media"]
+    icon: "🎬"
+    healthCheck:
+      enabled: true
+      type: "http"
+      url: "http://192.168.1.100:32400/web"
+      interval: 120
+      timeout: 10
+
+  - id: "router"
+    type: "service"
+    title: "路由器管理"
+    url: "http://192.168.1.1"
+    description: "网络路由器配置界面"
+    tags: ["service", "monitor", "network"]
+    icon: "🌐"
+    healthCheck:
+      enabled: true
+      type: "http"
+      url: "http://192.168.1.1"
+      interval: 300
+      timeout: 10
+
+  # 清单管理类
+  - id: "tech-learning"
+    type: "checklist"
+    title: "技术学习清单"
+    description: "2024年要掌握的技术栈和工具"
+    tags: ["personal", "list", "tech"]
+    icon: "📚"
+    items:
+      - id: "react-18"
+        text: "学习 React 18 新特性 (Concurrent Features)"
+        completed: true
+      - id: "typescript"
+        text: "掌握 TypeScript 高级类型系统"
+        completed: true
+      - id: "nextjs-14"
+        text: "深入 Next.js 14 App Router"
+        completed: false
+      - id: "rust"
+        text: "学习 Rust 编程语言基础"
+        completed: false
+      - id: "webassembly"
+        text: "了解 WebAssembly 应用"
+        completed: false
+      - id: "kubernetes"
+        text: "掌握 Kubernetes 容器编排"
+        completed: false
+      - id: "tailwind"
+        text: "熟练使用 Tailwind CSS"
+        completed: true
+      - id: "docker"
+        text: "深入学习 Docker 容器技术"
+        completed: true
+
+  - id: "home-projects"
+    type: "checklist"
+    title: "家庭技术项目"
+    description: "需要完成的家庭智能化项目"
+    tags: ["personal", "list", "home"]
+    icon: "🔧"
+    items:
+      - id: "smart-lights"
+        text: "安装智能灯泡和开关"
+        completed: true
+      - id: "security-camera"
+        text: "部署安防摄像头系统"
+        completed: false
+      - id: "backup-system"
+        text: "搭建自动备份系统"
+        completed: true
+      - id: "vpn-server"
+        text: "配置家庭VPN服务器"
+        completed: false
+      - id: "network-upgrade"
+        text: "升级家庭网络设备"
+        completed: false
+
+  - id: "reading-list"
+    type: "checklist"
+    title: "2024阅读清单"
+    description: "计划阅读的技术和管理书籍"
+    tags: ["personal", "list", "reading"]
+    icon: "📖"
+    items:
+      - id: "clean-code"
+        text: "《Clean Code》- Robert C. Martin"
+        completed: true
+      - id: "system-design"
+        text: "《Designing Data-Intensive Applications》"
+        completed: false
+      - id: "rust-book"
+        text: "《The Rust Programming Language》"
+        completed: false
+      - id: "ddd-book"
+        text: "《Domain-Driven Design》"
+        completed: false
+      - id: "microservices"
+        text: "《Building Microservices》"
+        completed: true
+
+  - id: "fitness-goals"
+    type: "checklist"
+    title: "健身目标"
+    description: "2024年健身和健康目标"
+    tags: ["personal", "list", "health"]
+    icon: "💪"
+    items:
+      - id: "gym-routine"
+        text: "建立每周3次健身房训练"
+        completed: true
+      - id: "running"
+        text: "每周跑步3次，每次5公里"
+        completed: false
+      - id: "weight-goal"
+        text: "减重10公斤"
+        completed: false
+      - id: "diet-plan"
+        text: "制定健康饮食计划"
+        completed: true
+
+  # 设计和创意工具
+  - id: "figma"
+    type: "website"
+    title: "Figma"
+    url: "https://figma.com"
+    description: "协作式UI设计工具"
+    tags: ["design", "tool"]
+    icon: "🎯"
+
+  - id: "unsplash"
+    type: "website"
+    title: "Unsplash"
+    url: "https://unsplash.com"
+    description: "免费高质量图片库"
+    tags: ["design", "photo"]
+    icon: "📸"
+
+  # 生产力工具
+  - id: "notion"
+    type: "website"
+    title: "Notion"
+    url: "https://notion.so"
+    description: "All-in-one 工作空间"
+    tags: ["tool", "productivity"]
+    icon: "📋"
+
+  - id: "raycast"
+    type: "website"
+    title: "Raycast"
+    url: "https://raycast.com"
+    description: "macOS 效率启动器"
+    tags: ["tool", "productivity", "mac"]
+    icon: "🚀"
+
+  # 学习资源
+  - id: "mdn"
+    type: "website"
+    title: "MDN Web Docs"
+    url: "https://developer.mozilla.org"
+    description: "Web开发权威文档"
+    tags: ["learn", "reference", "web"]
+    icon: "📚"
+
+  - id: "stackoverflow"
+    type: "website"
+    title: "Stack Overflow"
+    url: "https://stackoverflow.com"
+    description: "程序员问答社区"
+    tags: ["dev", "community"]
+    icon: "❓"
