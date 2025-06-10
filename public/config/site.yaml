@@ -40,6 +40,18 @@ layout:
     - name: "个人清单"
       tags: ["personal", "list"]
       priority: 4
+  
+  # 类型分组配置 - 自定义每种类型的显示名称和排序
+  typeGroups:
+    website:
+      title: "常用网站"
+      priority: 1
+    service:
+      title: "服务监控"
+      priority: 2
+    checklist:
+      title: "任务清单"
+      priority: 3
 
 # 导出配置
 export:

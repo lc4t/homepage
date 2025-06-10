@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download } from 'lucide-react';
 import { Item } from '@/types/config';
 import { exportToMarkdown } from '@/lib/config';
+import { useTheme } from './ThemeProvider';
 
 interface SearchFilterProps {
   items: Item[];
@@ -18,9 +19,16 @@ export function SearchFilter({
   exportTemplate, 
   exportItemFormat 
 }: SearchFilterProps) {
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
+  
+  // 客户端挂载检测
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 提取所有标签
   useEffect(() => {
@@ -50,7 +58,7 @@ export function SearchFilter({
     }
 
     onFilter(filtered);
-  }, [searchQuery, selectedTags, items]); // 移除 onFilter 从依赖数组
+  }, [searchQuery, selectedTags, items, onFilter]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev =>
@@ -102,17 +110,27 @@ export function SearchFilter({
   };
 
   return (
-    <div className="bg-white/10 dark:bg-white/5 backdrop-blur-[10px] border border-white/20 dark:border-white/10 rounded-2xl p-6">
+    <div className="apple-card p-6">
       {/* 搜索框 */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/50" />
+          <Search 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" 
+            style={{color: 'var(--text-tertiary)'}} 
+          />
           <input
             type="text"
             placeholder="搜索网站、服务或清单..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              borderColor: 'var(--border-secondary)',
+              color: 'var(--text-primary)',
+              borderWidth: '1px',
+              borderStyle: 'solid'
+            }}
           />
         </div>
         
@@ -141,7 +159,7 @@ export function SearchFilter({
 
       {/* 标签筛选 */}
       <div className="flex flex-wrap gap-2">
-        <div className="flex items-center gap-1 text-white/70 dark:text-white/80 text-sm">
+        <div className="flex items-center gap-1 text-sm" style={{color: 'var(--text-secondary)'}}>
           <Filter className="w-4 h-4" />
           <span>标签:</span>
         </div>
@@ -154,13 +172,14 @@ export function SearchFilter({
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
-              className={`
-                px-3 py-1.5 rounded-lg text-sm transition-all
-                ${isSelected
-                  ? 'bg-white/20 dark:bg-white/30 text-white border border-white/30 dark:border-white/40'
-                  : 'bg-white/10 dark:bg-white/20 text-white/80 dark:text-white/90 hover:bg-white/15 dark:hover:bg-white/25 border border-transparent'
-                }
-              `}
+              className="px-3 py-1.5 rounded-lg text-sm transition-all"
+              style={{
+                backgroundColor: isSelected ? 'var(--bg-hover)' : 'var(--bg-secondary)',
+                color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: isSelected ? 'var(--border-primary)' : 'transparent'
+              }}
             >
               {tag}
               <span className="ml-1 text-xs opacity-60">({count})</span>
@@ -171,7 +190,7 @@ export function SearchFilter({
 
       {/* 筛选状态提示 */}
       {(searchQuery || selectedTags.length > 0) && (
-        <div className="mt-3 text-white/60 dark:text-white/70 text-sm">
+        <div className="mt-3 text-sm" style={{color: 'var(--text-tertiary)'}}>
           {searchQuery && (
             <span>搜索: "{searchQuery}" </span>
           )}

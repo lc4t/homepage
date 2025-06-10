@@ -172,6 +172,7 @@ export default function HomePage() {
               <ItemGrid 
                 items={filteredItems}
                 onOpenChecklist={handleOpenChecklist}
+                config={config}
               />
             ) : (
               <div className="text-center text-white/60 dark:text-white/70 py-12">

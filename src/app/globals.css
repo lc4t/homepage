@@ -2,6 +2,30 @@
 
 :root {
   --font-inter: 'Inter', sans-serif;
+  
+  /* 亮色主题变量 */
+  --bg-primary: rgba(255, 255, 255, 0.15);
+  --bg-secondary: rgba(255, 255, 255, 0.1);
+  --bg-hover: rgba(255, 255, 255, 0.25);
+  --border-primary: rgba(255, 255, 255, 0.2);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+  --text-primary: rgba(255, 255, 255, 1);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark {
+  /* 暗色主题变量 */
+  --bg-primary: rgba(0, 0, 0, 0.3);
+  --bg-secondary: rgba(0, 0, 0, 0.2);
+  --bg-hover: rgba(0, 0, 0, 0.4);
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --shadow-color: rgba(0, 0, 0, 0.4);
 }
 
 /* 全局样式 */
@@ -20,6 +44,7 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
 }
 
 /* 自定义滚动条 */
@@ -80,13 +105,27 @@ body {
 /* 毛玻璃效果增强 */
 .glass-effect {
   backdrop-filter: blur(20px) saturate(180%);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 8px 32px 0 var(--shadow-color);
+  transition: all 0.3s ease;
 }
 
-.dark .glass-effect {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* Apple风格卡片 */
+.apple-card {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 var(--shadow-color);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.apple-card:hover {
+  background: var(--bg-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px 0 var(--shadow-color);
 }
 
 /* 选择器样式重置 */
@@ -94,7 +133,7 @@ input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--bg-secondary);
   border-radius: 2px;
   outline: none;
 }
@@ -104,20 +143,20 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 16px;
   height: 16px;
-  background: #ffffff;
+  background: var(--text-primary);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px var(--shadow-color);
 }
 
 input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #ffffff;
+  background: var(--text-primary);
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px var(--shadow-color);
 }
 
 /* 复选框样式 */
@@ -126,7 +165,7 @@ input[type="checkbox"] {
   appearance: none;
   width: 1rem;
   height: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--border-primary);
   border-radius: 0.25rem;
   background: transparent;
   cursor: pointer;
@@ -177,8 +216,8 @@ input[type="checkbox"]:checked::after {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px var(--shadow-color), 
+              0 10px 10px -5px var(--shadow-color);
 }
 
 /* 焦点样式 */

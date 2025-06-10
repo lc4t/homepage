@@ -32,6 +32,13 @@ export interface LayoutConfig {
     tags: string[];
     priority: number;
   }>;
+  // 类型分组配置
+  typeGroups?: {
+    [key: string]: {
+      title: string;  // 显示名称
+      priority: number; // 显示顺序
+    }
+  };
 }
 
 // 导出配置类型

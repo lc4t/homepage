@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Item, ServiceItem } from '@/types/config';
+import { Item, ServiceItem, Config } from '@/types/config';
 import { HealthChecker, ChecklistManager } from '@/lib/config';
-import { ExternalLink, Clock, CheckSquare } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 interface ItemCardProps {
@@ -13,7 +13,7 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProps) {
-  const { theme } = useTheme();
+  const { theme } = useTheme(); // 获取当前主题
   const [progress, setProgress] = useState<{completed: number; total: number} | null>(null);
   const [iconError, setIconError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -99,100 +99,67 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
   };
 
   // 在服务器端或客户端首次渲染时使用基本样式
-  const cardStyle = mounted 
-    ? `
-        group relative 
-        ${theme === 'dark' 
-          ? 'bg-white/5 border-white/10 hover:bg-white/10' 
-          : 'bg-white/10 border-white/20 hover:bg-white/15'
-        }
-        backdrop-blur-[10px] border rounded-xl p-4
-        hover:-translate-y-1 hover:shadow-lg hover:shadow-black/10
-        transition-all duration-300 cursor-pointer
-        ${className}
-      `
-    : `
-        group relative 
-        bg-white/10 border-white/20
-        backdrop-blur-[10px] border rounded-xl p-4
-        transition-all duration-300 cursor-pointer
-        ${className}
-      `;
-
-  const tagStyle = (index: number) => {
-    if (!mounted) return "px-2 py-0.5 bg-white/10 text-white/80 text-xs rounded-md";
-    
-    return `
-      px-2 py-0.5 text-xs rounded-md
-      ${theme === 'dark' 
-        ? 'bg-white/20 text-white/90' 
-        : 'bg-white/10 text-white/80'
-      }
-    `;
-  };
-
-  const extraTagsStyle = mounted && theme === 'dark' 
-    ? 'text-xs text-white/60' 
-    : 'text-xs text-white/50';
-
-  const progressStyle = mounted && theme === 'dark' 
-    ? 'text-xs text-white/70' 
-    : 'text-xs text-white/60';
+  const cardBaseClass = "group relative backdrop-blur-[10px] rounded-xl transition-all duration-300 cursor-pointer";
+  const cardClass = mounted ? `apple-card ${className}` : `${cardBaseClass} bg-white/10 border border-white/20 ${className}`;
 
   return (
     <div 
-      className={cardStyle}
+      className={cardClass}
       onClick={handleClick}
       data-theme={mounted ? theme : undefined}
     >
-      {/* 图标和状态 */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="relative">
-          {renderIcon()}
+      <div className="p-6">
+        {/* 图标和标题并排 */}
+        <div className="flex items-center mb-3">
+          <div className="mr-3">
+            {renderIcon()}
+          </div>
+          
+          <h3 className="text-white font-medium text-sm flex-grow" style={{color: 'var(--text-primary)'}}>
+            {item.title}
+          </h3>
+          
+          <div className="ml-2">
+            {getStatusIndicator()}
+            {item.type === 'checklist' && (
+              <CheckSquare className="w-4 h-4 text-white/60 mt-1" />
+            )}
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          {getStatusIndicator()}
-          {item.type === 'checklist' ? (
-            <CheckSquare className="w-4 h-4 text-white/60" />
-          ) : (
-            <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60 transition-colors" />
-          )}
-        </div>
-      </div>
 
-      {/* 标题 */}
-      <h3 className="text-white font-medium text-sm mb-1 line-clamp-1">
-        {item.title}
-      </h3>
+        {/* 描述 - 完整显示 */}
+        <p className="text-xs mb-4 leading-relaxed" style={{color: 'var(--text-secondary)'}}>
+          {item.description}
+        </p>
 
-      {/* 描述 */}
-      <p className="text-white/70 text-xs mb-3 line-clamp-2 leading-relaxed">
-        {item.description}
-      </p>
-
-      {/* 底部信息 */}
-      <div className="flex items-center justify-between">
-        {/* 标签 */}
-        <div className="flex gap-1 flex-wrap">
-          {item.tags.slice(0, 2).map((tag, index) => (
+        {/* 底部信息 */}
+        <div className="flex flex-wrap gap-1.5 mt-auto">
+          {/* 标签 - 完整显示所有标签 */}
+          {item.tags.map((tag, index) => (
             <span 
               key={index}
-              className={tagStyle(index)}
+              className="px-2 py-0.5 text-xs rounded-md"
+              style={{
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-secondary)'
+              }}
             >
               {tag}
             </span>
           ))}
-          {item.tags.length > 2 && (
-            <span className={extraTagsStyle}>
-              +{item.tags.length - 2}
+          
+          {/* 进度信息 */}
+          {getProgressInfo() && (
+            <span 
+              className="px-2 py-0.5 text-xs rounded-md ml-auto"
+              style={{
+                backgroundColor: 'var(--bg-secondary)',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              {getProgressInfo()}
             </span>
           )}
-        </div>
-
-        {/* 进度或其他信息 */}
-        <div className={progressStyle}>
-          {getProgressInfo()}
         </div>
       </div>
     </div>
@@ -203,20 +170,85 @@ interface ItemGridProps {
   items: Item[];
   onOpenChecklist?: (item: Item) => void;
   className?: string;
+  config?: Config;
 }
 
-export function ItemGrid({ items, onOpenChecklist, className = '' }: ItemGridProps) {
+export function ItemGrid({ items, onOpenChecklist, className = '', config }: ItemGridProps) {
+  // 根据项目类型进行分组
+  const groupedByType = React.useMemo(() => {
+    // 获取所有唯一的项目类型
+    const types = Array.from(new Set(items.map(item => item.type)));
+    
+    // 为每种类型创建分组
+    const groups: Record<string, {
+      title: string;
+      items: Item[];
+      priority: number;
+    }> = {};
+    
+    // 为每种类型设置标题、优先级和项目
+    types.forEach(type => {
+      // 默认值
+      let title = 
+        type === 'website' ? '网站' :
+        type === 'service' ? '服务' :
+        type === 'checklist' ? '清单' :
+        type; // 如果是其他类型，直接使用类型名称
+      
+      let priority = 999; // 默认优先级最低
+      
+      // 如果配置文件中有定义，则使用配置文件中的值
+      if (config?.layout.typeGroups && config.layout.typeGroups[type]) {
+        title = config.layout.typeGroups[type].title || title;
+        priority = config.layout.typeGroups[type].priority || priority;
+      }
+      
+      groups[type] = {
+        title,
+        priority,
+        items: items.filter(item => item.type === type)
+      };
+    });
+    
+    return groups;
+  }, [items, config]);
+
+  // 如果没有项目，显示空状态
+  if (items.length === 0) {
+    return (
+      <div className="text-center text-white/60 py-12">
+        <p className="text-lg mb-2">没有找到匹配的项目</p>
+        <p className="text-sm">尝试调整搜索条件或检查配置文件</p>
+      </div>
+    );
+  }
+
+  // 按优先级排序类型
+  const sortedTypes = Object.keys(groupedByType).sort((a, b) => 
+    groupedByType[a].priority - groupedByType[b].priority
+  );
+
   return (
-    <div className={`
-      grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 
-      gap-4 ${className}
-    `}>
-      {items.map((item) => (
-        <ItemCard 
-          key={item.id} 
-          item={item} 
-          onOpenChecklist={onOpenChecklist}
-        />
+    <div className="space-y-8">
+      {/* 遍历所有类型分组（按优先级排序） */}
+      {sortedTypes.map((type) => (
+        <div key={type}>
+          <h2 className="text-lg font-medium mb-4 px-2" style={{color: 'var(--text-primary)'}}>
+            {groupedByType[type].title}
+          </h2>
+          <div className={`
+            grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
+            gap-4 ${className}
+          `}>
+            {groupedByType[type].items.map((item) => (
+              <ItemCard 
+                key={item.id} 
+                item={item} 
+                onOpenChecklist={onOpenChecklist}
+              />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );
