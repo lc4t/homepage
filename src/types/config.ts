@@ -4,6 +4,8 @@ export interface SiteConfig {
   description: string;
   author: string;
   analytics?: string;
+  // 网站图标
+  favicon?: string;
   // 个人链接
   links?: {
     github?: string;
@@ -44,13 +46,11 @@ export interface LayoutConfig {
     tags: string[];
     priority: number;
   }>;
-  // 类型分组配置
-  typeGroups?: {
-    [key: string]: {
-      title: string;  // 显示名称
-      priority: number; // 显示顺序
-    }
-  };
+  // 类型分组配置 - 允许任意字符串键
+  typeGroups?: Record<string, {
+    title: string;  // 显示名称
+    priority: number; // 显示顺序
+  }>;
 }
 
 // 导出配置类型
@@ -79,6 +79,13 @@ export interface ChecklistItem {
   completed: boolean;
 }
 
+// 分享列表项目类型
+export interface SharedListItem {
+  id: string;
+  text: string;
+  url: string;
+}
+
 // 基础项目类型
 interface BaseItem {
   id: string;
@@ -86,6 +93,7 @@ interface BaseItem {
   description: string;
   tags: string[];
   icon?: string;
+  type: string; // 允许任意类型字符串
 }
 
 // 网站项目类型
@@ -107,8 +115,19 @@ export interface ChecklistItemConfig extends BaseItem {
   items: ChecklistItem[];
 }
 
+// 分享列表项目类型
+export interface SharedListItemConfig extends BaseItem {
+  type: 'sharedlist';
+  items: SharedListItem[];
+}
+
+// 其他类型项目
+export interface CustomItemConfig extends BaseItem {
+  [key: string]: any; // 允许任意额外属性
+}
+
 // 联合项目类型
-export type Item = WebsiteItem | ServiceItem | ChecklistItemConfig;
+export type Item = WebsiteItem | ServiceItem | ChecklistItemConfig | SharedListItemConfig | CustomItemConfig;
 
 // 完整配置类型
 export interface Config {

@@ -63,6 +63,8 @@ export async function loadConfig(): Promise<Config> {
       layout: { 
         pinned: config.layout?.pinned || DEFAULT_CONFIG.layout!.pinned,
         groups: config.layout?.groups || DEFAULT_CONFIG.layout!.groups,
+        pinnedTags: config.layout?.pinnedTags || [],
+        typeGroups: config.layout?.typeGroups || {},
       },
       export: { ...DEFAULT_CONFIG.export, ...config.export },
       items: config.items || [],
@@ -184,12 +186,40 @@ export function exportToMarkdown(
   
   const itemsText = filteredItems
     .map(item => {
-      return format
-        .replace('{title}', item.title)
-        .replace('{url}', item.url || '#')
-        .replace('{description}', item.description);
+      // 处理不同类型的项目
+      if (item.type === 'sharedlist' && item.items && item.items.length > 0) {
+        // 分享列表类型，导出所有链接
+        const listHeader = format
+          .replace('{title}', item.title)
+          .replace('{url}', '#')
+          .replace('{description}', item.description);
+        
+        const links = item.items.map((link: any) => 
+          `  - [${link.text}](${link.url})`
+        ).join('\n');
+        
+        return `${listHeader}\n${links}`;
+      } else if (item.type === 'checklist' && item.items && item.items.length > 0) {
+        // 清单类型，导出所有项目
+        const listHeader = format
+          .replace('{title}', item.title)
+          .replace('{url}', '#')
+          .replace('{description}', item.description);
+        
+        const tasks = item.items.map((task: any) => 
+          `  - [${task.completed ? 'x' : ' '}] ${task.text}`
+        ).join('\n');
+        
+        return `${listHeader}\n${tasks}`;
+      } else {
+        // 普通项目
+        return format
+          .replace('{title}', item.title)
+          .replace('{url}', item.url || '#')
+          .replace('{description}', item.description);
+      }
     })
-    .join('\n');
+    .join('\n\n');
   
   if (tag && template) {
     return template

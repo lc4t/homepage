@@ -4,6 +4,8 @@ site:
   description: "Personal Navigation Hub"
   author: "Your Name"
   analytics: "" # Google Analytics ID，留空则不启用
+  # 网站图标（支持相对路径或绝对URL）
+  favicon: "/favicon.png"
   # 个人链接
   links:
     github: "https://github.com/yourusername"
@@ -69,6 +71,9 @@ layout:
     checklist:
       title: "任务清单"
       priority: 3
+    sharedlist:
+      title: "分享列表"
+      priority: 4
 
 # 导出配置
 export:
@@ -222,6 +227,30 @@ items:
       - id: "docker"
         text: "深入学习 Docker 容器技术"
         completed: true
+
+  # 分享列表示例
+  - id: "video-tutorials"
+    type: "sharedlist"
+    title: "视频教程合集"
+    description: "收集的各种学习视频和教程链接"
+    tags: ["video", "learning", "tutorial"]
+    icon: "🎬"
+    items:
+      - id: "nextjs-course"
+        text: "Next.js 完整教程 - 从入门到精通"
+        url: "https://www.youtube.com/watch?v=843nec-IvW0"
+      - id: "react-hooks"
+        text: "React Hooks 深度解析"
+        url: "https://www.bilibili.com/video/BV1Ge411W7Ra"
+      - id: "typescript-tutorial"
+        text: "TypeScript 实战教程"
+        url: "https://space.bilibili.com/390120104/channel/seriesdetail?sid=2695077"
+      - id: "rust-beginner"
+        text: "Rust 语言入门指南"
+        url: "https://www.youtube.com/watch?v=5C_HPTJg5ek"
+      - id: "docker-kubernetes"
+        text: "Docker 和 Kubernetes 从零开始"
+        url: "https://www.bilibili.com/video/BV1Tg411P7EB"
 
   - id: "home-projects"
     type: "checklist"

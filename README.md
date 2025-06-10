@@ -71,6 +71,7 @@ site:
   title: "我的导航站" # 网站标题
   description: "Personal Navigation Hub" # 网站描述
   author: "Your Name" # 作者名称
+  favicon: "/favicon.png" # 网站图标（支持相对路径或绝对URL）
 
 appearance:
   theme:
@@ -167,6 +168,22 @@ items:
       - id: "react"
         text: "学习 React 18"
         completed: false
+```
+
+#### 分享列表
+```yaml
+  - id: "video-tutorials"
+    type: "sharedlist"
+    title: "视频教程合集"
+    description: "收集的学习视频和教程链接"
+    tags: ["video", "learning"]
+    items:
+      - id: "nextjs-course"
+        text: "Next.js 完整教程"
+        url: "https://www.youtube.com/watch?v=example"
+      - id: "react-hooks"
+        text: "React Hooks 深度解析"
+        url: "https://www.bilibili.com/video/example"
 ```
 
 ## 🛠️ 自定义开发

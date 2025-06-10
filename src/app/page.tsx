@@ -1,20 +1,23 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Config, Item, ChecklistItemConfig } from '@/types/config';
+import { Config, Item, ChecklistItemConfig, SharedListItemConfig } from '@/types/config';
 import { loadConfig, HealthChecker } from '@/lib/config';
 import { Background } from '@/components/Background';
 import { Header } from '@/components/Header';
 import { SearchFilter } from '@/components/SearchFilter';
 import { ItemGrid } from '@/components/ItemCard';
 import { ChecklistModal } from '@/components/ChecklistModal';
+import { SharedListModal } from '@/components/SharedListModal';
 import { FloatingExportButton } from '@/components/FloatingExportButton';
+import { FaviconHandler } from '@/components/FaviconHandler';
 import { useTheme } from '@/components/ThemeProvider';
 
 export default function HomePage() {
   const [config, setConfig] = useState<Config | null>(null);
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [selectedChecklist, setSelectedChecklist] = useState<ChecklistItemConfig | null>(null);
+  const [selectedSharedList, setSelectedSharedList] = useState<SharedListItemConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +29,8 @@ export default function HomePage() {
       try {
         setLoading(true);
         const loadedConfig = await loadConfig();
+        console.log("加载的配置:", loadedConfig);
+        console.log("类型分组配置:", loadedConfig.layout.typeGroups);
         setConfig(loadedConfig);
         setFilteredItems(loadedConfig.items);
       } catch (err) {
@@ -72,6 +77,16 @@ export default function HomePage() {
 
   const handleCloseChecklist = () => {
     setSelectedChecklist(null);
+  };
+
+  const handleOpenSharedList = (item: Item) => {
+    if (item.type === 'sharedlist') {
+      setSelectedSharedList(item as SharedListItemConfig);
+    }
+  };
+
+  const handleCloseSharedList = () => {
+    setSelectedSharedList(null);
   };
 
   const handleFilter = useCallback((items: Item[]) => {
@@ -154,6 +169,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen relative">
+      {/* 动态设置favicon */}
+      <FaviconHandler />
+      
       {/* 背景 */}
       <Background config={config.appearance.background} />
       
@@ -184,6 +202,7 @@ export default function HomePage() {
               <ItemGrid 
                 items={filteredItems}
                 onOpenChecklist={handleOpenChecklist}
+                onOpenSharedList={handleOpenSharedList}
                 config={config}
               />
             ) : (
@@ -209,6 +228,12 @@ export default function HomePage() {
       <ChecklistModal 
         item={selectedChecklist}
         onClose={handleCloseChecklist}
+      />
+
+      {/* 分享列表弹窗 */}
+      <SharedListModal 
+        item={selectedSharedList}
+        onClose={handleCloseSharedList}
       />
 
       {/* Google Analytics */}

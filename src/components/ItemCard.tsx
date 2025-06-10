@@ -3,16 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { Item, ServiceItem, Config } from '@/types/config';
 import { HealthChecker, ChecklistManager, getFaviconUrl } from '@/lib/config';
-import { CheckSquare } from 'lucide-react';
+import { CheckSquare, Link } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 interface ItemCardProps {
   item: Item;
   onOpenChecklist?: (item: Item) => void;
+  onOpenSharedList?: (item: Item) => void;
   className?: string;
 }
 
-export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProps) {
+export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = '' }: ItemCardProps) {
   const { theme } = useTheme(); // 获取当前主题
   const [progress, setProgress] = useState<{completed: number; total: number} | null>(null);
   const [iconError, setIconError] = useState(false);
@@ -32,31 +33,52 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
   }, [item]);
 
   const handleClick = () => {
-    if (item.type === 'checklist') {
-      onOpenChecklist?.(item);
-    } else if ('url' in item) {
+    // 如果是清单类型，打开清单弹窗
+    if (item.type === 'checklist' && onOpenChecklist) {
+      onOpenChecklist(item);
+      return;
+    }
+    
+    // 如果是分享列表类型，打开分享列表弹窗
+    if (item.type === 'sharedlist' && onOpenSharedList) {
+      onOpenSharedList(item);
+      return;
+    }
+    
+    // 如果是网站或服务类型，跳转到URL
+    if ((item.type === 'website' || item.type === 'service' || 'url' in item) && 'url' in item) {
       window.open(item.url, '_blank');
     }
   };
 
   const getStatusIndicator = () => {
+    // 如果是服务类型，显示服务状态
     if (item.type === 'service') {
-      const serviceItem = item as ServiceItem;
-      if (serviceItem.healthCheck?.enabled) {
-        const status = HealthChecker.getStatus(item.id);
-        return (
-          <div 
-            className={`w-2 h-2 rounded-full ${
-              status.status === 'online' ? 'bg-green-400' :
-              status.status === 'offline' ? 'bg-red-400' :
-              status.status === 'checking' ? 'bg-yellow-400 animate-pulse' :
-              'bg-gray-400'
-            }`}
-            title={`状态: ${status.status}`}
-          />
-        );
-      }
+      const status = HealthChecker.getStatus(item.id);
+      
+      if (!status) return null;
+      
+      const color = 
+        status.status === 'online' ? '#10b981' :  // 绿色
+        status.status === 'offline' ? '#ef4444' : // 红色
+        status.status === 'checking' ? '#f59e0b' : // 黄色
+        '#6b7280'; // 灰色
+      
+      const title = 
+        status.status === 'online' ? '在线' :
+        status.status === 'offline' ? '离线' :
+        status.status === 'checking' ? '检查中' :
+        '未知';
+      
+      return (
+        <div 
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: color }}
+          title={title}
+        />
+      );
     }
+    
     return null;
   };
 
@@ -64,6 +86,11 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
     if (item.type === 'checklist' && progress) {
       return `${progress.completed}/${progress.total}`;
     }
+    
+    if (item.type === 'sharedlist' && 'items' in item) {
+      return `${item.items.length} 链接`;
+    }
+    
     return null;
   };
 
@@ -139,7 +166,10 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
           <div className="ml-2">
             {getStatusIndicator()}
             {item.type === 'checklist' && (
-              <CheckSquare className="w-4 h-4 text-white/60 mt-1" />
+              <CheckSquare className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
+            )}
+            {item.type === 'sharedlist' && (
+              <Link className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
             )}
           </div>
         </div>
@@ -186,11 +216,19 @@ export function ItemCard({ item, onOpenChecklist, className = '' }: ItemCardProp
 interface ItemGridProps {
   items: Item[];
   onOpenChecklist?: (item: Item) => void;
+  onOpenSharedList?: (item: Item) => void;
   className?: string;
   config?: Config;
 }
 
-export function ItemGrid({ items, onOpenChecklist, className = '', config }: ItemGridProps) {
+export function ItemGrid({ items, onOpenChecklist, onOpenSharedList, className = '', config }: ItemGridProps) {
+  // 添加调试日志
+  React.useEffect(() => {
+    if (config?.layout.typeGroups) {
+      console.log("ItemGrid接收到的typeGroups配置:", config.layout.typeGroups);
+    }
+  }, [config]);
+  
   // 根据项目类型进行分组
   const groupedByType = React.useMemo(() => {
     // 获取所有唯一的项目类型
@@ -205,18 +243,13 @@ export function ItemGrid({ items, onOpenChecklist, className = '', config }: Ite
     
     // 为每种类型设置标题、优先级和项目
     types.forEach(type => {
-      // 默认值
-      let title = 
-        type === 'website' ? '网站' :
-        type === 'service' ? '服务' :
-        type === 'checklist' ? '清单' :
-        type; // 如果是其他类型，直接使用类型名称
-      
+      // 默认值 - 如果没有配置，则使用类型名称本身作为默认值
+      let title = type;
       let priority = 999; // 默认优先级最低
       
       // 如果配置文件中有定义，则使用配置文件中的值
       // 注意：typeGroups用于按类型分组，而groups用于按标签分组
-      if (config?.layout.typeGroups && config.layout.typeGroups[type]) {
+      if (config?.layout.typeGroups && type in config.layout.typeGroups) {
         title = config.layout.typeGroups[type].title || title;
         priority = config.layout.typeGroups[type].priority || priority;
       }
@@ -249,25 +282,29 @@ export function ItemGrid({ items, onOpenChecklist, className = '', config }: Ite
   return (
     <div className="space-y-8">
       {/* 遍历所有类型分组（按优先级排序） */}
-      {sortedTypes.map((type) => (
-        <div key={type}>
-          <h2 className="text-lg font-medium mb-4 px-2" style={{color: 'var(--text-primary)'}}>
-            {groupedByType[type].title}
-          </h2>
-          <div className={`
-            grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
-            gap-4 ${className}
-          `}>
-            {groupedByType[type].items.map((item) => (
-              <ItemCard 
-                key={item.id} 
-                item={item} 
-                onOpenChecklist={onOpenChecklist}
-              />
-            ))}
+      {sortedTypes.map((type) => {
+        console.log(`渲染类型 ${type}, 标题: ${groupedByType[type].title}`);
+        return (
+          <div key={type}>
+            <h2 className="text-lg font-medium mb-4 px-2" style={{color: 'var(--text-primary)'}}>
+              {groupedByType[type].title}
+            </h2>
+            <div className={`
+              grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
+              gap-4 ${className}
+            `}>
+              {groupedByType[type].items.map((item) => (
+                <ItemCard 
+                  key={item.id} 
+                  item={item} 
+                  onOpenChecklist={onOpenChecklist}
+                  onOpenSharedList={onOpenSharedList}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
