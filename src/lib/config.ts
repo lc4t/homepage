@@ -219,9 +219,19 @@ export function exportToMarkdown(
             .replace('{url}', '#')
             .replace('{description}', checklistItem.description);
           
-          const tasks = checklistItem.items.map((task: ChecklistItem) => 
-            `  - [${task.completed ? 'x' : ' '}] ${task.text}`
-          ).join('\n');
+          // 处理清单项，支持小标题
+          const tasks = checklistItem.items.map((task: ChecklistItem) => {
+            // 如果是小标题，使用 Markdown 的三级标题格式
+            if (task.isHeader) {
+              // 支持缩进
+              const indent = task.indent ? '  '.repeat(task.indent) : '';
+              return `${indent}### ${task.text}`;
+            }
+            
+            // 普通任务项，支持缩进
+            const indent = task.indent ? '  '.repeat(task.indent) : '';
+            return `${indent}- [${task.completed ? 'x' : ' '}] ${task.text}`;
+          }).join('\n');
           
           return `${listHeader}\n${tasks}`;
         }

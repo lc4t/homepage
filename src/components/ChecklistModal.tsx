@@ -49,11 +49,32 @@ export function ChecklistModal({ item, onClose }: ChecklistModalProps) {
     const todoItems = item.items.filter(subItem => !subItem.isHeader);
     
     const completedItems = item.items.filter(subItem => 
-      !subItem.isHeader && checklistState[subItem.id]
+      checklistState[subItem.id]
     );
     const pendingItems = item.items.filter(subItem => 
       !subItem.isHeader && !checklistState[subItem.id]
     );
+
+    // 创建包含小标题的完整项目列表
+    const allItems = [...item.items];
+    
+    // 将项目分为已完成和未完成两组，但保留小标题
+    const completedGroup = [];
+    const pendingGroup = [];
+    
+    for (const subItem of allItems) {
+      if (subItem.isHeader) {
+        // 小标题添加到两个组
+        completedGroup.push(subItem);
+        pendingGroup.push(subItem);
+      } else if (checklistState[subItem.id]) {
+        // 已完成的任务
+        completedGroup.push(subItem);
+      } else {
+        // 未完成的任务
+        pendingGroup.push(subItem);
+      }
+    }
 
     const markdown = `# ${item.title}
 
@@ -61,7 +82,7 @@ ${item.description}
 
 ## 已完成 (${completedItems.length}/${todoItems.length})
 
-${completedItems.map(subItem => {
+${completedGroup.map(subItem => {
   const indent = subItem.indent || 0;
   const spaces = '  '.repeat(indent);
   // 如果是小标题，使用 Markdown 的三级标题格式
@@ -73,7 +94,7 @@ ${completedItems.map(subItem => {
 
 ## 待完成 (${pendingItems.length}/${todoItems.length})
 
-${pendingItems.map(subItem => {
+${pendingGroup.map(subItem => {
   const indent = subItem.indent || 0;
   const spaces = '  '.repeat(indent);
   // 如果是小标题，使用 Markdown 的三级标题格式
