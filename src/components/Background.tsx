@@ -6,9 +6,10 @@ import { useTheme } from './ThemeProvider';
 
 interface BackgroundProps {
   config: AppearanceConfig['background'];
+  onLoaded?: () => void;
 }
 
-export function Background({ config }: BackgroundProps) {
+export function Background({ config, onLoaded }: BackgroundProps) {
   const { theme } = useTheme();
   const [backgroundUrl, setBackgroundUrl] = useState<string>('');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -39,11 +40,13 @@ export function Background({ config }: BackgroundProps) {
         case 'color':
           // 纯色背景不需要图片URL
           setIsLoaded(true);
+          onLoaded?.();
           return;
         default:
           // 默认使用渐变背景
           setUseFallback(true);
           setIsLoaded(true);
+          onLoaded?.();
           return;
       }
 
@@ -53,24 +56,27 @@ export function Background({ config }: BackgroundProps) {
         img.onload = () => {
           setBackgroundUrl(url);
           setIsLoaded(true);
+          onLoaded?.();
         };
         img.onerror = () => {
           // 图片加载失败，使用备用渐变背景
           console.error('图片加载失败:', url);
           setUseFallback(true);
           setIsLoaded(true);
+          onLoaded?.();
         };
         img.src = url;
       } else {
         setUseFallback(true);
         setIsLoaded(true);
+        onLoaded?.();
       }
     };
 
     if (mounted) {
       loadBackground();
     }
-  }, [config, mounted]);
+  }, [config, mounted, onLoaded]);
 
   const getBackgroundStyle = () => {
     if (useFallback) {

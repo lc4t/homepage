@@ -21,6 +21,7 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   // 加载配置 - 只在组件挂载时执行
   useEffect(() => {
@@ -43,9 +44,11 @@ export default function HomePage() {
     loadData();
   }, []);
 
-  // 启动健康检查 - 当配置加载后执行
+  // 启动健康检查 - 当配置加载后且背景图片加载完成后执行
   useEffect(() => {
-    if (!config) return;
+    if (!config || !backgroundLoaded) return;
+    
+    console.log("背景图片已加载，开始执行健康检查...");
 
     // 启动服务健康检查
     config.items.forEach(item => {
@@ -75,7 +78,7 @@ export default function HomePage() {
         }
       });
     };
-  }, [config]);
+  }, [config, backgroundLoaded]);
 
   const handleOpenChecklist = (item: Item) => {
     if (item.type === 'checklist') {
@@ -95,6 +98,12 @@ export default function HomePage() {
 
   const handleCloseSharedList = () => {
     setSelectedSharedList(null);
+  };
+
+  // 处理背景加载完成的回调
+  const handleBackgroundLoaded = () => {
+    console.log("背景图片加载完成");
+    setBackgroundLoaded(true);
   };
 
   const handleFilter = useCallback((items: Item[]) => {
@@ -181,7 +190,7 @@ export default function HomePage() {
       <FaviconHandler siteConfig={config.site} />
       
       {/* 背景 */}
-      <Background config={config.appearance.background} />
+      <Background config={config.appearance.background} onLoaded={handleBackgroundLoaded} />
       
       {/* 内容区域 */}
       <div className="container mx-auto px-4 py-8 relative z-10">
@@ -251,14 +260,14 @@ export default function HomePage() {
             async 
             src={`https://www.googletagmanager.com/gtag/js?id=${config.site.analytics}`}
           />
-          <script
+          <script 
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
                 gtag('config', '${config.site.analytics}');
-              `,
+              `
             }}
           />
         </>

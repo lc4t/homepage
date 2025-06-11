@@ -72,7 +72,7 @@ layout:
             title: "服务"
             priority: 2
         checklist:
-            title: "TODO清单"
+            title: "执行清单"
             priority: 3
         sharedlist:
             title: "分享清单"
@@ -96,21 +96,9 @@ items:
       type: "website"
       title: "Claude"
       url: "https://claude.ai"
-      description: "Anthropic 开发的AI助手，擅长写作、编程和分析"
-      tags: ["AI", "工具"]
-      icon:
-          type: "emoji"
-          value: "🤖"
+      description: "当前最好用的代码、数据分析 AI 工具"
+      tags: ["AI", "APP"]
 
-    # - id: "chatgpt"
-    #   type: "website"
-    #   title: "ChatGPT"
-    #   url: "https://chat.openai.com"
-    #   description: "OpenAI 开发的对话AI，功能强大"
-    #   tags: [AI", "工具"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "💬"
 
     - id: "Sai2"
       type: "website"
@@ -118,51 +106,117 @@ items:
       url: "https://piv.ink/sai2/"
       description: "Sai2 安装指引"
       tags: ["绘画", "APP"]
-      # 没有配置icon，自动获取favicon
+
     - id: "Skyscanner"
       type: "website"
       title: "天巡 Skyscanner"
       url: "https://www.skyscanner.com/"
       description: "航班比价和监控服务"
-      tags: ["工具", "旅游"]
+      tags: ["APP", "旅游"]
 
-    # 开发工具类
-    # - id: "github"
-    #   type: "website"
-    #   title: "GitHub"
-    #   url: "https://github.com"
-    #   description: "代码托管和协作平台"
-    #   tags: ["dev", "tool"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "💻"
+    - id: "n8n"
+      type: "service"
+      title: "n8n"
+      url: "http://macmini.internal.sakanano.moe:5678"
+      description: "定时任务自动化平台"
+      tags: ["自动化"]
+      icon:
+        type: "url"
+        value: "https://n8n.io/favicon.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://macmini.internal.sakanano.moe:5678"
 
-    # - id: "vercel"
-    #   type: "website"
-    #   title: "Vercel"
-    #   url: "https://vercel.com"
-    #   description: "现代化的前端部署平台"
-    #   tags: ["dev", "tool", "deploy"]
+    - id: "Dify"
+      type: "service"
+      title: "Dify"
+      url: "http://macmini.internal.sakanano.moe:3080"
+      description: "AI Workflow 平台"
+      tags: ["AI", "自动化"]
+      icon:
+        type: "url"
+        value: "https://raw.githubusercontent.com/langgenius/dify/refs/heads/main/web/public/logo/logo.svg"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://macmini.internal.sakanano.moe:3080"
+          interval: 60
+          timeout: 5
 
+    - id: "qinglong"
+      type: "service"
+      title: "Qinglong"
+      url: "http://macmini.internal.sakanano.moe:5700"
+      description: "定时执行 Python 脚本"
+      tags: ["自动化"]
+      icon:
+        type: "url"
+        value: "https://qn.whyour.cn/favicon.svg"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://macmini.internal.sakanano.moe:5700"
+          interval: 60
+          timeout: 5
 
-    # - id: "vscode"
-    #   type: "website"
-    #   title: "VS Code"
-    #   url: "https://code.visualstudio.com"
-    #   description: "强大的代码编辑器"
-    #   tags: ["dev", "tool", "editor"]
+    - id: "emby"
+      type: "service"
+      title: "Emby"
+      url: "http://nas.internal.sakanano.moe:8096"
+      description: "Emby 媒体服务器"
+      tags: ["nas", "视频"]
+      icon:
+        type: "url"
+        value: "https://emby.media/favicon.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://nas.internal.sakanano.moe:8096"
+          interval: 60
+          timeout: 5
 
+    - id: "qbitorrent"
+      type: "service"
+      title: "Qbitorrent"
+      url: "http://nas.internal.sakanano.moe:8081"
+      description: "Qbitorrent 下载工具"
+      tags: ["nas", "下载", "APP"]
+      icon:
+        type: "url"
+        value: "https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://nas.internal.sakanano.moe:8081"
+          interval: 60
+          timeout: 5
 
-    # 服务监控类（带健康检查）
+    - id: "BiliLiveRecorder"
+      type: "service"
+      title: "BiliLiveRecorder"
+      url: "http://nas.internal.sakanano.moe:2356/ui/recorder/local/rooms"
+      description: "B 站直播录制工具"
+      tags: ["nas", "下载", "APP"]
+      icon:
+        type: "url"
+        value: "https://raw.githubusercontent.com/BililiveRecorder/BililiveRecorder-WebUI/refs/heads/master/public/favicon.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://nas.internal.sakanano.moe:2356/"
+          interval: 60
+          timeout: 5
+
     - id: "surge"
       type: "service"
       title: "Surge"
       url: "https://nssurge.com/"
       description: "Surge 代理"
-      tags: ["服务", "APP"]
-      # icon:
-      #     type: "emoji"
-      #     value: "🌐"
+      tags: ["APP", "网络"]
+      icon:
+          type: "url"
+          value: "https://nssurge.com/favicon.ico"
       healthCheck:
           enabled: true
           type: "tcp"
@@ -171,69 +225,57 @@ items:
           interval: 600
           timeout: 3
 
-    # - id: "nas-server"
-    #   type: "service"
-    #   title: "Synology"
-    #   url: "http://nas.internal.sakanano.moe:5001"
-    #   description: "Synology NAS 主页"
-    #   tags: ["服务", "nas"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🖥️"
-    #   healthCheck:
-    #       enabled: true
-    #       type: "http"
-    #       url: "http://nas.internal.sakanano.moe:5001"
-    #       interval: 60
-    #       timeout: 5
+    - id: "nas-server"
+      type: "service"
+      title: "Synology"
+      url: "https://nas.internal.sakanano.moe:5001/"
+      description: "Synology NAS 主页"
+      tags: ["nas"]
+      icon:
+          type: "url"
+          value: "https://fileres.synology.com/images/common/favicon/syno/favicon.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "https://nas.internal.sakanano.moe:5001/"
+          interval: 60
+          timeout: 5
 
-    # - id: "home-assistant"
-    #   type: "service"
-    #   title: "Home Assistant"
-    #   url: "http://192.168.1.101:8123"
-    #   description: "智能家居控制中心"
-    #   tags: ["service", "monitor", "smart-home"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🏠"
-    #   healthCheck:
-    #       enabled: true
-    #       type: "http"
-    #       url: "http://192.168.1.101:8123"
-    #       interval: 60
-    #       timeout: 5
+    - id: "home-assistant"
+      type: "service"
+      title: "Home Assistant"
+      url: "http://nas.internal.sakanano.moe:8123"
+      description: "智能家居控制中心"
+      tags: ["nas", "智能家居"]
+      icon:
+          type: "url"
+          value: "https://www.home-assistant.io/images/favicon.ico"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://nas.internal.sakanano.moe:8123"
+          interval: 60
+          timeout: 5
+      
+    - id: "wewerss"
+      type: "service"
+      title: "WeweRSS"
+      url: "http://macmini.internal.sakanano.moe:4000"
+      description: "公众号文章转 RSS 服务"
+      tags: ["nas", "自动化"]
+      icon:
+        type: "url"
+        value: "https://raw.githubusercontent.com/cooderl/wewe-rss/refs/heads/main/assets/logo.png"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://macmini.internal.sakanano.moe:4000"
+          interval: 60
+          timeout: 5
 
-    # - id: "plex-server"
-    #   type: "service"
-    #   title: "Plex Media Server"
-    #   url: "http://192.168.1.100:32400"
-    #   description: "家庭媒体服务器"
-    #   tags: ["service", "monitor", "media"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🎬"
-    #   healthCheck:
-    #       enabled: true
-    #       type: "http"
-    #       url: "http://192.168.1.100:32400/web"
-    #       interval: 120
-    #       timeout: 10
+  
 
-    # - id: "router"
-    #   type: "service"
-    #   title: "路由器管理"
-    #   url: "http://192.168.1.1"
-    #   description: "网络路由器配置界面"
-    #   tags: ["service", "monitor", "network"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🌐"
-    #   healthCheck:
-    #       enabled: true
-    #       type: "http"
-    #       url: "http://192.168.1.1"
-    #       interval: 300
-    #       timeout: 10
+
 
     # 清单管理类
     # - id: "tech-learning"
@@ -371,7 +413,7 @@ items:
     - id: "resignation-checklist"
       type: "checklist"
       title: "离职清单 1.0"
-      description: "离职和毕业注意事项"
+      description: "离职注意事项"
       tags: ["工作"]
       icon:
         type: "emoji"
