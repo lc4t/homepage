@@ -45,20 +45,55 @@
 
 ### 部署到 GitHub Pages
 
-1. **启用 GitHub Pages**
+#### 🌟 双环境部署支持
+
+本项目支持**生产环境**和**开发环境**两套独立的 GitHub Pages 部署：
+
+- **生产环境** (`main` 分支): 稳定版本，官方访问地址
+- **开发环境** (`dev` 分支): 测试版本，包含开发标识横幅
+
+#### ⚡ 快速设置（推荐）
+
+```bash
+# 给设置脚本添加执行权限
+chmod +x setup-pages.sh
+
+# 运行自动设置脚本
+./setup-pages.sh
+```
+
+#### 🔧 手动设置
+
+1. **启用生产环境 GitHub Pages**
    - 进入仓库 Settings → Pages
    - Source 选择 "GitHub Actions"
 
-2. **推送代码**
+2. **创建开发分支**
+   ```bash
+   git checkout -b dev
+   git push -u origin dev
+   ```
+
+3. **设置开发环境 Pages**
+   - 推送到 `dev` 分支后，会自动部署到 `gh-pages-dev` 分支
+   - 在 Pages 设置中可以切换查看开发版本
+
+4. **推送代码**
    ```bash
    git add .
    git commit -m "Initial commit"
-   git push origin main
+   git push origin main  # 部署生产环境
+   git push origin dev   # 部署开发环境
    ```
 
-3. **等待构建完成**
-   - 查看 Actions 页面的构建状态
-   - 构建完成后访问 `https://your-username.github.io/homepage`
+#### 📊 部署特性
+
+- **自动构建**: 每次推送自动触发部署
+- **版本标识**: 开发版本显示橙色横幅和时间戳
+- **详细日志**: Actions 页面提供完整的部署报告
+- **并行部署**: 生产和开发环境独立部署
+
+> 📚 **详细说明**: 查看 `README_PAGES_SETUP.md` 获取完整的双环境部署指南
 
 ## 📝 配置说明
 

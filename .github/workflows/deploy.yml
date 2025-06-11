@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Production to GitHub Pages
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pages-production"
   cancel-in-progress: false
 
 jobs:
@@ -37,6 +37,12 @@ jobs:
         run: npm run build
         env:
           NEXT_OUTPUT: export
+          GITHUB_ACTIONS: true
+          
+      - name: Add production build identifier
+        run: |
+          echo "<!-- 🌟 PRODUCTION BUILD - $(date) -->" >> ./out/index.html
+          echo "<script>console.log('🌟 PRODUCTION BUILD - $(date)');</script>" >> ./out/index.html
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -60,3 +66,18 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
+      - name: Create deployment summary
+        run: |
+          echo "## 🌟 Production Build Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: \`main\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Time**: \`$(date)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: \`Production\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Access Production Site" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Your production site is available at:" >> $GITHUB_STEP_SUMMARY
+          echo "\`${{ steps.deployment.outputs.page_url }}\`" >> $GITHUB_STEP_SUMMARY
