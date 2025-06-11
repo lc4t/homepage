@@ -1,0 +1,693 @@
+# 完整测试配置 - 统一使用对象格式图标
+site:
+    # 基本网站配置
+    analytics: "G-05Q1SV2M23" # Google Analytics ID，留空则不启用
+    favicon: "/favicon.ico" # 网站图标（支持相对路径或绝对URL）
+    avatar: "/avatar.png" # 头像图片（支持相对路径或绝对URL）
+    # 元数据配置（用于SEO和页面信息）
+    metadata:
+        title: "HomePage"
+        description: "一个完全 AI 驱动的导航分享站"
+        keywords: "导航, 个人, 服务, 管理, navigation, dashboard"
+        author: "lc4t"
+        language: "zh-CN"
+    # 个人链接
+    links:
+        github: "https://github.com/lc4t/homepage"
+        blog: "https://blog.sakanano.moe"
+        # custom:
+        #     - name: "Github"
+        #       url: "https://github.com/lc4t"
+        #       icon:
+        #           type: "emoji"
+        #           value: "😄"
+
+# 外观配置
+appearance:
+    theme:
+        auto: true # 是否根据时间自动切换主题
+        default: "light" # 默认主题：light/dark
+    background:
+        type: "bing" # bing/color/image/url
+        value: "today" # today/random 或者具体的日期索引
+        blur: 5 # 背景模糊程度 0-20
+        opacity: 0.8 # 背景透明度 0-1
+    card:
+        blur: 10 # 卡片背景模糊 0-20
+        opacity: 0.15 # 卡片透明度 0-1
+
+# 布局配置
+layout:
+    # 置顶项目（显示在最前面）
+    pinned:
+        - "claude-ai"
+        - "github"
+
+    # 置顶标签（标签筛选时优先显示）
+    pinnedTags:
+        - "AI"
+        - "服务"
+
+    # 自定义分组和排序
+    groups:
+        - name: "AI工具"
+          tags: ["ai", "tool"]
+          priority: 1
+        - name: "开发工具"
+          tags: ["dev", "tool"]
+          priority: 2
+        - name: "服务监控"
+          tags: ["service", "monitor"]
+          priority: 3
+        - name: "个人清单"
+          tags: ["personal", "list"]
+          priority: 4
+
+    # 类型分组配置 - 自定义每种类型的显示名称和排序
+    typeGroups:
+        website:
+            title: "网站"
+            priority: 1
+        service:
+            title: "服务"
+            priority: 2
+        checklist:
+            title: "TODO清单"
+            priority: 3
+        sharedlist:
+            title: "分享清单"
+            priority: 4
+
+# 导出配置
+export:
+    markdown:
+        # 按标签导出时的模板
+        template: |
+            ## {tag}
+
+            {items}
+        # 单个项目的格式
+        item_format: "- [{title}]({url}) - {description}"
+
+# 完整测试项目配置 - 统一使用对象格式图标
+items:
+    # AI 工具类
+    - id: "claude-ai"
+      type: "website"
+      title: "Claude"
+      url: "https://claude.ai"
+      description: "Anthropic 开发的AI助手，擅长写作、编程和分析"
+      tags: ["AI", "工具"]
+      icon:
+          type: "emoji"
+          value: "🤖"
+
+    # - id: "chatgpt"
+    #   type: "website"
+    #   title: "ChatGPT"
+    #   url: "https://chat.openai.com"
+    #   description: "OpenAI 开发的对话AI，功能强大"
+    #   tags: [AI", "工具"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "💬"
+
+    - id: "Sai2"
+      type: "website"
+      title: "Sai 2"
+      url: "https://piv.ink/sai2/"
+      description: "Sai2 安装指引"
+      tags: ["绘画", "APP"]
+      # 没有配置icon，自动获取favicon
+    - id: "Skyscanner"
+      type: "website"
+      title: "天巡 Skyscanner"
+      url: "https://www.skyscanner.com/"
+      description: "航班比价和监控服务"
+      tags: ["工具", "旅游"]
+
+    # 开发工具类
+    # - id: "github"
+    #   type: "website"
+    #   title: "GitHub"
+    #   url: "https://github.com"
+    #   description: "代码托管和协作平台"
+    #   tags: ["dev", "tool"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "💻"
+
+    # - id: "vercel"
+    #   type: "website"
+    #   title: "Vercel"
+    #   url: "https://vercel.com"
+    #   description: "现代化的前端部署平台"
+    #   tags: ["dev", "tool", "deploy"]
+
+
+    # - id: "vscode"
+    #   type: "website"
+    #   title: "VS Code"
+    #   url: "https://code.visualstudio.com"
+    #   description: "强大的代码编辑器"
+    #   tags: ["dev", "tool", "editor"]
+
+
+    # 服务监控类（带健康检查）
+    - id: "surge"
+      type: "service"
+      title: "Surge"
+      url: "https://nssurge.com/"
+      description: "Surge 代理"
+      tags: ["服务", "APP"]
+      # icon:
+      #     type: "emoji"
+      #     value: "🌐"
+      healthCheck:
+          enabled: true
+          type: "tcp"
+          host: "127.0.0.1"
+          port: 6152
+          interval: 600
+          timeout: 3
+
+    # - id: "nas-server"
+    #   type: "service"
+    #   title: "Synology"
+    #   url: "http://nas.internal.sakanano.moe:5001"
+    #   description: "Synology NAS 主页"
+    #   tags: ["服务", "nas"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🖥️"
+    #   healthCheck:
+    #       enabled: true
+    #       type: "http"
+    #       url: "http://nas.internal.sakanano.moe:5001"
+    #       interval: 60
+    #       timeout: 5
+
+    # - id: "home-assistant"
+    #   type: "service"
+    #   title: "Home Assistant"
+    #   url: "http://192.168.1.101:8123"
+    #   description: "智能家居控制中心"
+    #   tags: ["service", "monitor", "smart-home"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🏠"
+    #   healthCheck:
+    #       enabled: true
+    #       type: "http"
+    #       url: "http://192.168.1.101:8123"
+    #       interval: 60
+    #       timeout: 5
+
+    # - id: "plex-server"
+    #   type: "service"
+    #   title: "Plex Media Server"
+    #   url: "http://192.168.1.100:32400"
+    #   description: "家庭媒体服务器"
+    #   tags: ["service", "monitor", "media"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🎬"
+    #   healthCheck:
+    #       enabled: true
+    #       type: "http"
+    #       url: "http://192.168.1.100:32400/web"
+    #       interval: 120
+    #       timeout: 10
+
+    # - id: "router"
+    #   type: "service"
+    #   title: "路由器管理"
+    #   url: "http://192.168.1.1"
+    #   description: "网络路由器配置界面"
+    #   tags: ["service", "monitor", "network"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🌐"
+    #   healthCheck:
+    #       enabled: true
+    #       type: "http"
+    #       url: "http://192.168.1.1"
+    #       interval: 300
+    #       timeout: 10
+
+    # 清单管理类
+    # - id: "tech-learning"
+    #   type: "checklist"
+    #   title: "技术学习清单"
+    #   description: "2024年要掌握的技术栈和工具"
+    #   tags: ["personal", "list", "tech"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "📚"
+    #   items:
+    #       - id: "react-18"
+    #         text: "学习 React 18 新特性 (Concurrent Features)"
+    #         completed: true
+    #       - id: "typescript"
+    #         text: "掌握 TypeScript 高级类型系统"
+    #         completed: true
+    #       - id: "nextjs-14"
+    #         text: "深入 Next.js 14 App Router"
+    #         completed: false
+    #       - id: "rust"
+    #         text: "学习 Rust 编程语言基础"
+    #         completed: false
+    #       - id: "webassembly"
+    #         text: "了解 WebAssembly 应用"
+    #         completed: false
+    #       - id: "kubernetes"
+    #         text: "掌握 Kubernetes 容器编排"
+    #         completed: false
+    #       - id: "tailwind"
+    #         text: "熟练使用 Tailwind CSS"
+    #         completed: true
+    #       - id: "docker"
+    #         text: "深入学习 Docker 容器技术"
+    #         completed: true
+
+    # 分享列表示例
+    # - id: "video-tutorials"
+    #   type: "sharedlist"
+    #   title: "视频教程合集"
+    #   description: "收集的各种学习视频和教程链接"
+    #   tags: ["video", "learning", "tutorial"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🎬"
+    #   items:
+    #       - id: "nextjs-course"
+    #         text: "Next.js 完整教程 - 从入门到精通"
+    #         url: "https://www.youtube.com/watch?v=843nec-IvW0"
+    #       - id: "react-hooks"
+    #         text: "React Hooks 深度解析"
+    #         url: "https://www.bilibili.com/video/BV1Ge411W7Ra"
+    #       - id: "typescript-tutorial"
+    #         text: "TypeScript 实战教程"
+    #         url: "https://space.bilibili.com/390120104/channel/seriesdetail?sid=2695077"
+    #       - id: "rust-beginner"
+    #         text: "Rust 语言入门指南"
+    #         url: "https://www.youtube.com/watch?v=5C_HPTJg5ek"
+    #       - id: "docker-kubernetes"
+    #         text: "Docker 和 Kubernetes 从零开始"
+    #         url: "https://www.bilibili.com/video/BV1Tg411P7EB"
+
+    # - id: "home-projects"
+    #   type: "checklist"
+    #   title: "家庭技术项目"
+    #   description: "需要完成的家庭智能化项目"
+    #   tags: ["personal", "list", "home"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🔧"
+    #   items:
+    #       - id: "smart-lights"
+    #         text: "安装智能灯泡和开关"
+    #         completed: true
+    #       - id: "security-camera"
+    #         text: "部署安防摄像头系统"
+    #         completed: false
+    #       - id: "backup-system"
+    #         text: "搭建自动备份系统"
+    #         completed: true
+    #       - id: "vpn-server"
+    #         text: "配置家庭VPN服务器"
+    #         completed: false
+    #       - id: "network-upgrade"
+    #         text: "升级家庭网络设备"
+    #         completed: false
+
+    # - id: "reading-list"
+    #   type: "checklist"
+    #   title: "2024阅读清单"
+    #   description: "计划阅读的技术和管理书籍"
+    #   tags: ["personal", "list", "reading"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "📖"
+    #   items:
+    #       - id: "clean-code"
+    #         text: "《Clean Code》- Robert C. Martin"
+    #         completed: true
+    #       - id: "system-design"
+    #         text: "《Designing Data-Intensive Applications》"
+    #         completed: false
+    #       - id: "rust-book"
+    #         text: "《The Rust Programming Language》"
+    #         completed: false
+    #       - id: "ddd-book"
+    #         text: "《Domain-Driven Design》"
+    #         completed: false
+    #       - id: "microservices"
+    #         text: "《Building Microservices》"
+    #         completed: true
+
+    # - id: "fitness-goals"
+    #   type: "checklist"
+    #   title: "健身目标"
+    #   description: "2024年健身和健康目标"
+    #   tags: ["personal", "list", "health"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "💪"
+    #   items:
+    #       - id: "gym-routine"
+    #         text: "建立每周3次健身房训练"
+    #         completed: true
+    #       - id: "running"
+    #         text: "每周跑步3次，每次5公里"
+    #         completed: false
+    #       - id: "weight-goal"
+    #         text: "减重10公斤"
+    #         completed: false
+    #       - id: "diet-plan"
+    #         text: "制定健康饮食计划"
+    #         completed: true
+
+    - id: "resignation-checklist"
+      type: "checklist"
+      title: "离职清单 1.0"
+      description: "离职和毕业注意事项"
+      tags: ["工作"]
+      icon:
+        type: "emoji"
+        value: "💼"
+      items:
+          # 离职谈判与手续
+          - id: "resignation-category"
+            text: "离职谈判与手续"
+            completed: false
+            isHeader: true
+          - id: "resignation-interview"
+            text: "离职面谈准备，了解流程时间"
+            completed: false
+            indent: 1
+          - id: "record-evidence"
+            text: "如有争议准备录音等证据"
+            completed: false
+            indent: 1
+          - id: "social-insurance"
+            text: "确认社保缴费截止时间和转移手续"
+            completed: false
+            indent: 1
+          - id: "housing-fund"
+            text: "办理公积金提取或转移手续"
+            completed: false
+            indent: 1
+          - id: "transition-period"
+            text: "确认过渡期工作安排和到岗要求"
+            completed: false
+            indent: 1
+        
+          # 经济补偿与福利
+          - id: "compensation-category"
+            text: "经济补偿与福利"
+            completed: false
+            isHeader: true
+          - id: "compensation-amount"
+            text: "确认赔偿金具体金额和计算方式"
+            completed: false
+            indent: 1
+          - id: "last-working-day"
+            text: "明确最后工作日期"
+            completed: false
+            indent: 1
+          - id: "housing-subsidy"
+            text: "确认住房补贴发放情况"
+            completed: false
+            indent: 1
+          - id: "employee-loan"
+            text: "员工购房贷款转商业贷款手续"
+            completed: false
+            indent: 1
+          - id: "stock-options"
+            text: "了解股票期权和已归属权益处理"
+            completed: false
+            indent: 1
+          - id: "vacation-cash"
+            text: "年假、调休假等假期折现"
+            completed: false
+            indent: 1
+          
+          # 公司福利处理
+          - id: "benefits-category"
+            text: "公司福利处理"
+            completed: false
+            isHeader: true
+          - id: "internal-points"
+            text: "使用完毕公司内部积分和福利券"
+            completed: false
+            indent: 1
+          - id: "gift-cards"
+            text: "兑换购物卡、旅游卡等"
+            completed: false
+            indent: 1
+          - id: "annual-checkup"
+            text: "预约并完成年度体检"
+            completed: false
+            indent: 1
+          - id: "benefit-services"
+            text: "使用福利平台免费服务"
+            completed: false
+            indent: 1
+          - id: "holiday-gifts"
+            text: "确认节日礼品领取资格"
+            completed: false
+            indent: 1
+          - id: "employee-discounts"
+            text: "开通员工专属折扣服务"
+            completed: false
+            indent: 1
+          
+          # 证明文件与材料
+          - id: "documents-category"
+            text: "证明文件与材料"
+            completed: false
+            isHeader: true
+          - id: "employment-certificate"
+            text: "打印在职证明、收入证明"
+            completed: false
+            indent: 1
+          - id: "resignation-certificate"
+            text: "确认离职证明模板"
+            completed: false
+            indent: 1
+          - id: "unemployment-insurance"
+            text: "准备失业保险申领材料"
+            completed: false
+            indent: 1
+          - id: "backup-documents"
+            text: "员工卡扫描件和工作证明备份"
+            completed: false
+            indent: 1
+          
+          # 趁在职办理事项
+          - id: "opportunity-category"
+            text: "趁在职办理事项"
+            completed: false
+            isHeader: true
+          - id: "credit-cards"
+            text: "申请信用卡和员工专属贷款"
+            completed: false
+            indent: 1
+          - id: "visa-application"
+            text: "利用在职身份申请签证"
+            completed: false
+            indent: 1
+          - id: "bank-accounts"
+            text: "办理银行卡开户服务"
+            completed: false
+            indent: 1
+          - id: "platform-verification"
+            text: "完成职场社交平台员工认证"
+            completed: false
+            indent: 1
+          
+          # 物品与纪念品
+          - id: "items-category"
+            text: "物品与纪念品"
+            completed: false
+            isHeader: true
+          - id: "office-supplies"
+            text: "清理办公用品和个人物品"
+            completed: false
+            indent: 1
+          - id: "equipment-ownership"
+            text: "申请电脑设备归属"
+            completed: false
+            indent: 1
+          - id: "souvenirs"
+            text: "收集工作纪念品"
+            completed: false
+            indent: 1
+          - id: "workplace-photos"
+            text: "办公环境拍照留念"
+            completed: false
+            indent: 1
+          
+          # 内部沟通
+          - id: "communication-category"
+            text: "内部沟通"
+            completed: false
+            isHeader: true
+          - id: "farewell-message"
+            text: "发布离职感言和感谢"
+            completed: false
+            indent: 1
+          - id: "work-handover"
+            text: "完成项目交接文档"
+            completed: false
+            indent: 1
+          - id: "contact-transfer"
+            text: "移交重要联系人信息"
+            completed: false
+            indent: 1
+          - id: "account-handover"
+            text: "移交账号权限"
+            completed: false
+            indent: 1
+          
+          # 注意事项
+          - id: "notes-category"
+            text: "注意事项"
+            completed: false
+            isHeader: true
+          - id: "document-copies"
+            text: "保留所有离职相关文件副本"
+            completed: false
+            indent: 1
+          - id: "legal-evidence"
+            text: "妥善保存录音截图等证据"
+            completed: false
+            indent: 1
+          - id: "confidentiality"
+            text: "确认保密协议条款"
+            completed: false
+            indent: 1
+          - id: "rehire-policy"
+            text: "了解离职对将来重新入职的影响"
+            completed: false
+            indent: 1
+
+    # - id: "hierarchical-checklist"
+    #   type: "checklist"
+    #   title: "分层清单示例"
+    #   description: "展示如何使用小标题功能的清单示例"
+    #   tags: ["示例"]
+    #   icon:
+    #     type: "emoji"
+    #     value: "📋"
+    #   items:
+    #       # 第一个小标题
+    #       - id: "header-1"
+    #         text: "主要任务一"
+    #         completed: false
+    #         isHeader: true
+          
+    #       # 第一个小标题下的任务
+    #       - id: "sub-task-1-1"
+    #         text: "子任务 1.1"
+    #         completed: false
+    #         indent: 1
+    #       - id: "sub-task-1-2"
+    #         text: "子任务 1.2"
+    #         completed: false
+    #         indent: 1
+          
+    #       # 第二个小标题下的子任务
+    #       - id: "header-1-2"
+    #         text: "子任务 1.2 的详细步骤"
+    #         completed: false
+    #         isHeader: true
+    #         indent: 1
+    #       - id: "sub-sub-task-1-2-1"
+    #         text: "子子任务 1.2.1"
+    #         completed: false
+    #         indent: 2
+    #       - id: "sub-sub-task-1-2-2"
+    #         text: "子子任务 1.2.2"
+    #         completed: false
+    #         indent: 2
+          
+    #       # 第二个主要小标题
+    #       - id: "header-2"
+    #         text: "主要任务二"
+    #         completed: false
+    #         isHeader: true
+          
+    #       # 第二个主要小标题下的任务
+    #       - id: "sub-task-2-1"
+    #         text: "子任务 2.1"
+    #         completed: false
+    #         indent: 1
+    #       - id: "sub-task-2-2"
+    #         text: "子任务 2.2"
+    #         completed: false
+    #         indent: 1
+
+    # 设计和创意工具
+    # - id: "figma"
+    #   type: "website"
+    #   title: "Figma"
+    #   url: "https://figma.com"
+    #   description: "协作式UI设计工具"
+    #   tags: ["design", "tool"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🎯"
+
+    # - id: "bing"
+    #   type: "website"
+    #   title: "Bing"
+    #   url: "https://www.bing.com"
+    #   description: "微软搜索引擎和每日精美壁纸"
+    #   tags: ["design", "photo"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "📸"
+
+    # 生产力工具
+    # - id: "notion"
+    #   type: "website"
+    #   title: "Notion"
+    #   url: "https://notion.so"
+    #   description: "All-in-one 工作空间"
+    #   tags: ["tool", "productivity"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "📋"
+
+    # - id: "raycast"
+    #   type: "website"
+    #   title: "Raycast"
+    #   url: "https://raycast.com"
+    #   description: "macOS 效率启动器"
+    #   tags: ["tool", "productivity", "mac"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "🚀"
+
+    # 学习资源
+    # - id: "mdn"
+    #   type: "website"
+    #   title: "MDN Web Docs"
+    #   url: "https://developer.mozilla.org"
+    #   description: "Web开发权威文档"
+    #   tags: ["learn", "reference", "web"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "📚"
+
+    # - id: "stackoverflow"
+    #   type: "website"
+    #   title: "Stack Overflow"
+    #   url: "https://stackoverflow.com"
+    #   description: "程序员问答社区"
+    #   tags: ["dev", "community"]
+    #   icon:
+    #       type: "emoji"
+    #       value: "❓"
