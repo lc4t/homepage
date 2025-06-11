@@ -22,9 +22,19 @@
 ### 基本信息
 ```yaml
 site:
-  title: "我的导航站"
-  description: "个人导航中心"
-  author: "你的名字"
+  # 元数据配置（用于SEO和页面信息）
+  metadata:
+    title: "我的导航站"
+    description: "个人导航中心"
+    author: "你的名字"
+    keywords: "导航, 个人, 工具"
+    language: "zh-CN"
+  # 网站图标
+  favicon: "/favicon.ico"
+  # 头像图片（显示在网站标题旁边）
+  avatar: "/avatar.png"
+  # Google Analytics ID，留空则不启用
+  analytics: ""
 ```
 
 ### 背景设置

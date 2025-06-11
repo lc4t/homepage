@@ -24,12 +24,23 @@ export interface IconConfig {
 
 // 网站配置类型
 export interface SiteConfig {
-  title: string;
-  description: string;
-  author: string;
+  // 以下字段移动到metadata中，但保留为可选项以兼容旧配置
+  title?: string;
+  description?: string;
+  author?: string;
   analytics?: string;
   // 网站图标
   favicon?: string;
+  // 头像图片路径
+  avatar?: string;
+  // 元数据配置
+  metadata: {
+    title: string;
+    description: string;
+    keywords?: string;
+    author: string;
+    language?: string;
+  };
   // 个人链接
   links?: {
     github?: string;
@@ -101,6 +112,8 @@ export interface ChecklistItem {
   id: string;
   text: string;
   completed: boolean;
+  indent?: number; // 缩进级别，默认为0（不缩进）
+  isHeader?: boolean; // 是否为小标题
 }
 
 // 分享列表项目类型

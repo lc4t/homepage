@@ -4,9 +4,15 @@ import { Config, ServiceStatus, ChecklistState, Item, SharedListItemConfig, Chec
 // 默认配置
 const DEFAULT_CONFIG: Partial<Config> = {
   site: {
-    title: '个人导航站',
-    description: 'Personal Navigation Hub',
-    author: 'User',
+    favicon: '/favicon.ico',
+    analytics: '',
+    metadata: {
+      title: '个人导航站',
+      description: 'Personal Navigation Hub',
+      author: 'User',
+      language: 'zh-CN',
+      keywords: '导航, 个人, 服务, 管理',
+    },
   },
   appearance: {
     theme: {
@@ -54,7 +60,15 @@ export async function loadConfig(): Promise<Config> {
     
     // 深度合并配置
     const mergedConfig: Config = {
-      site: { ...DEFAULT_CONFIG.site, ...config.site },
+      site: { 
+        ...DEFAULT_CONFIG.site, 
+        ...config.site,
+        // 确保元数据被正确合并
+        metadata: {
+          ...DEFAULT_CONFIG.site?.metadata,
+          ...config.site?.metadata
+        }
+      },
       appearance: {
         theme: { ...DEFAULT_CONFIG.appearance!.theme, ...config.appearance?.theme },
         background: { ...DEFAULT_CONFIG.appearance!.background, ...config.appearance?.background },
@@ -149,10 +163,17 @@ export class ChecklistManager {
     return state[itemId]?.[checklistItemId] || false;
   }
   
-  static getProgress(itemId: string, totalItems: number): { completed: number; total: number } {
+  static getProgress(itemId: string, totalItems: number, items?: ChecklistItem[]): { completed: number; total: number } {
     const state = this.getState();
     const itemState = state[itemId] || {};
     const completed = Object.values(itemState).filter(Boolean).length;
+    
+    // 如果提供了items参数，则排除小标题项
+    if (items) {
+      const todoItems = items.filter(item => !item.isHeader);
+      return { completed, total: todoItems.length };
+    }
+    
     return { completed, total: totalItems };
   }
 }
@@ -252,7 +273,7 @@ export class HealthChecker {
         
         try {
           // 尝试连接端口
-          const response = await fetch(`http://${host}:${port}`, {
+          await fetch(`http://${host}:${port}`, {
             method: 'HEAD',
             mode: 'no-cors',
             signal: controller.signal,

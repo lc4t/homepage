@@ -174,9 +174,7 @@ export function SearchFilter({
         </div>
       )}
 
-      <div className="text-sm text-gray-500 dark:text-gray-400">
-        使用 &quot;,&quot; 分隔多个标签
-      </div>
+      {/* 移除了提示文字 */}
     </div>
   );
 }

@@ -11,7 +11,6 @@ import { ChecklistModal } from '@/components/ChecklistModal';
 import { SharedListModal } from '@/components/SharedListModal';
 import { FloatingExportButton } from '@/components/FloatingExportButton';
 import { FaviconHandler } from '@/components/FaviconHandler';
-import Image from 'next/image';
 
 export default function HomePage() {
   const [config, setConfig] = useState<Config | null>(null);
@@ -264,17 +263,6 @@ export default function HomePage() {
           />
         </>
       )}
-
-      <div className="flex items-center justify-center">
-        <Image
-          src="/avatar.png"
-          alt="Avatar"
-          width={120}
-          height={120}
-          className="rounded-full"
-          priority
-        />
-      </div>
     </main>
   );
 }

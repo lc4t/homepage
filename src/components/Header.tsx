@@ -5,6 +5,7 @@ import { Sun, Moon, Github, Globe, ExternalLink } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { SiteConfig } from '@/types/config';
 import { IconComponent } from './IconComponent';
+import Image from 'next/image';
 
 interface HeaderProps {
   siteConfig: SiteConfig;
@@ -92,17 +93,33 @@ export function Header({ siteConfig }: HeaderProps) {
     <header className="relative z-20 p-6">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center">
         {/* 网站信息 */}
-        <div className="flex-1 mb-4 sm:mb-0">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{color: 'var(--text-primary)'}}>
-            {siteConfig.title}
-          </h1>
-          <div className="flex flex-wrap items-center">
-            {siteConfig.description && (
-              <p className="text-xs sm:text-sm mr-2" style={{color: 'var(--text-secondary)'}}>
-                {siteConfig.description}
-              </p>
-            )}
-            {renderLinks()}
+        <div className="flex-1 mb-4 sm:mb-0 flex items-center">
+          {/* 头像 */}
+          {siteConfig.avatar && (
+            <div className="mr-4 flex-shrink-0">
+              <Image
+                src={siteConfig.avatar}
+                alt="Avatar"
+                width={48}
+                height={48}
+                className="rounded-full"
+                priority
+              />
+            </div>
+          )}
+          
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1" style={{color: 'var(--text-primary)'}}>
+              {siteConfig.title}
+            </h1>
+            <div className="flex flex-wrap items-center">
+              {siteConfig.description && (
+                <p className="text-xs sm:text-sm mr-2" style={{color: 'var(--text-secondary)'}}>
+                  {siteConfig.description}
+                </p>
+              )}
+              {renderLinks()}
+            </div>
           </div>
         </div>
 

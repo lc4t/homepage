@@ -30,7 +30,12 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
     if (item.type === 'checklist') {
       const checklistItem = item as ChecklistItemConfig;
       if (checklistItem.items) {
-        const progressData = ChecklistManager.getProgress(checklistItem.id, checklistItem.items.length);
+        // 传递完整的items数组，以便排除小标题项
+        const progressData = ChecklistManager.getProgress(
+          checklistItem.id, 
+          checklistItem.items.length, 
+          checklistItem.items
+        );
         setChecklistProgress(progressData);
       }
     }

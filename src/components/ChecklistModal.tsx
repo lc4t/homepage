@@ -30,6 +30,12 @@ export function ChecklistModal({ item, onClose }: ChecklistModalProps) {
   const toggleItem = (checklistItemId: string) => {
     if (!item) return;
     
+    // 找到对应的项目
+    const checklistItem = item.items.find(i => i.id === checklistItemId);
+    
+    // 如果是小标题，不切换状态
+    if (checklistItem?.isHeader) return;
+    
     ChecklistManager.toggleItem(item.id, checklistItemId);
     const newState = ChecklistManager.getState();
     setChecklistState(newState[item.id] || {});
@@ -39,24 +45,43 @@ export function ChecklistModal({ item, onClose }: ChecklistModalProps) {
   const exportMarkdown = async () => {
     if (!item) return;
 
+    // 过滤掉小标题项，只计算实际待办事项
+    const todoItems = item.items.filter(subItem => !subItem.isHeader);
+    
     const completedItems = item.items.filter(subItem => 
-      checklistState[subItem.id]
+      !subItem.isHeader && checklistState[subItem.id]
     );
     const pendingItems = item.items.filter(subItem => 
-      !checklistState[subItem.id]
+      !subItem.isHeader && !checklistState[subItem.id]
     );
 
     const markdown = `# ${item.title}
 
 ${item.description}
 
-## 已完成 (${completedItems.length}/${item.items.length})
+## 已完成 (${completedItems.length}/${todoItems.length})
 
-${completedItems.map(subItem => `- [x] ${subItem.text}`).join('\n')}
+${completedItems.map(subItem => {
+  const indent = subItem.indent || 0;
+  const spaces = '  '.repeat(indent);
+  // 如果是小标题，使用 Markdown 的三级标题格式
+  if (subItem.isHeader) {
+    return `${spaces}### ${subItem.text}`;
+  }
+  return `${spaces}- [x] ${subItem.text}`;
+}).join('\n')}
 
-## 待完成 (${pendingItems.length}/${item.items.length})
+## 待完成 (${pendingItems.length}/${todoItems.length})
 
-${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
+${pendingItems.map(subItem => {
+  const indent = subItem.indent || 0;
+  const spaces = '  '.repeat(indent);
+  // 如果是小标题，使用 Markdown 的三级标题格式
+  if (subItem.isHeader) {
+    return `${spaces}### ${subItem.text}`;
+  }
+  return `${spaces}- [ ] ${subItem.text}`;
+}).join('\n')}
 
 ---
 导出时间: ${new Date().toLocaleString()}
@@ -98,10 +123,12 @@ ${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
   const getProgress = () => {
     if (!item) return { completed: 0, total: 0, percentage: 0 };
     
-    const completed = item.items.filter(subItem => 
+    // 过滤掉小标题项
+    const todoItems = item.items.filter(subItem => !subItem.isHeader);
+    const completed = todoItems.filter(subItem => 
       checklistState[subItem.id]
     ).length;
-    const total = item.items.length;
+    const total = todoItems.length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     
     return { completed, total, percentage };
@@ -167,7 +194,26 @@ ${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
           <div className="space-y-2">
             {item.items.map((checklistItem) => {
               const isCompleted = checklistState[checklistItem.id] || false;
+              const indentLevel = checklistItem.indent || 0;
+              const isHeader = checklistItem.isHeader || false;
               
+              // 如果是小标题，使用不同的样式
+              if (isHeader) {
+                return (
+                  <div 
+                    key={checklistItem.id}
+                    className={`
+                      mt-4 mb-2 ${indentLevel > 0 ? 'ml-4' : ''}
+                    `}
+                  >
+                    <h3 className="text-white font-semibold text-md border-b border-white/20 pb-1">
+                      {checklistItem.text}
+                    </h3>
+                  </div>
+                );
+              }
+              
+              // 普通清单项
               return (
                 <div 
                   key={checklistItem.id}
@@ -176,6 +222,7 @@ ${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
                     hover:bg-white/5 dark:hover:bg-white/10 ${isCompleted ? 'opacity-75' : ''}
                   `}
                   onClick={() => toggleItem(checklistItem.id)}
+                  style={{ paddingLeft: `${(indentLevel * 1.5) + 0.75}rem` }}
                 >
                   <div className={`
                     w-5 h-5 rounded border-2 flex items-center justify-center transition-all
@@ -192,6 +239,7 @@ ${pendingItems.map(subItem => `- [ ] ${subItem.text}`).join('\n')}
                   <span className={`
                     text-white transition-all flex-1
                     ${isCompleted ? 'line-through opacity-60' : ''}
+                    ${indentLevel > 0 ? 'text-sm' : ''}
                   `}>
                     {checklistItem.text}
                   </span>

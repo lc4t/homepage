@@ -124,8 +124,13 @@ icon:
 
 ```yaml
 site:
-  title: "我的导航站"
-  description: "Personal Navigation Hub"
+  metadata:
+    title: "我的导航站"
+    description: "Personal Navigation Hub"
+    author: "用户名"
+    keywords: "导航, 个人, 工具"
+  favicon: "/favicon.ico"
+  avatar: "/avatar.png" # 头像图片
   links:
     github: "https://github.com/username"
     blog: "https://blog.example.com"
