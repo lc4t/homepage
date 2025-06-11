@@ -99,7 +99,6 @@ items:
       description: "当前最好用的代码、数据分析 AI 工具"
       tags: ["AI", "APP"]
 
-
     - id: "Sai2"
       type: "website"
       title: "Sai 2"
@@ -121,8 +120,8 @@ items:
       description: "定时任务自动化平台"
       tags: ["自动化"]
       icon:
-        type: "url"
-        value: "https://n8n.io/favicon.ico"
+          type: "url"
+          value: "https://n8n.io/favicon.ico"
       healthCheck:
           enabled: true
           type: "http"
@@ -135,8 +134,8 @@ items:
       description: "AI Workflow 平台"
       tags: ["AI", "自动化"]
       icon:
-        type: "url"
-        value: "https://raw.githubusercontent.com/langgenius/dify/refs/heads/main/web/public/logo/logo.svg"
+          type: "url"
+          value: "https://raw.githubusercontent.com/langgenius/dify/refs/heads/main/web/public/logo/logo.svg"
       healthCheck:
           enabled: true
           type: "http"
@@ -151,8 +150,8 @@ items:
       description: "定时执行 Python 脚本"
       tags: ["自动化"]
       icon:
-        type: "url"
-        value: "https://qn.whyour.cn/favicon.svg"
+          type: "url"
+          value: "https://qn.whyour.cn/favicon.svg"
       healthCheck:
           enabled: true
           type: "http"
@@ -167,8 +166,8 @@ items:
       description: "Emby 媒体服务器"
       tags: ["nas", "视频"]
       icon:
-        type: "url"
-        value: "https://emby.media/favicon.ico"
+          type: "url"
+          value: "https://emby.media/favicon.ico"
       healthCheck:
           enabled: true
           type: "http"
@@ -183,8 +182,8 @@ items:
       description: "Qbitorrent 下载工具"
       tags: ["nas", "下载", "APP"]
       icon:
-        type: "url"
-        value: "https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent.ico"
+          type: "url"
+          value: "https://raw.githubusercontent.com/qbittorrent/qBittorrent/refs/heads/master/src/icons/qbittorrent.ico"
       healthCheck:
           enabled: true
           type: "http"
@@ -199,8 +198,8 @@ items:
       description: "B 站直播录制工具"
       tags: ["nas", "下载", "APP"]
       icon:
-        type: "url"
-        value: "https://raw.githubusercontent.com/BililiveRecorder/BililiveRecorder-WebUI/refs/heads/master/public/favicon.ico"
+          type: "url"
+          value: "https://raw.githubusercontent.com/BililiveRecorder/BililiveRecorder-WebUI/refs/heads/master/public/favicon.ico"
       healthCheck:
           enabled: true
           type: "http"
@@ -216,7 +215,7 @@ items:
       tags: ["APP", "网络"]
       icon:
           type: "url"
-          value: "https://nssurge.com/favicon.ico"
+          value: "data:image/png;base64,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"
       healthCheck:
           enabled: true
           type: "tcp"
@@ -249,14 +248,14 @@ items:
       tags: ["nas", "智能家居"]
       icon:
           type: "url"
-          value: "https://www.home-assistant.io/images/favicon.ico"
+          value: "https://raw.githubusercontent.com/home-assistant/frontend/refs/heads/dev/public/static/icons/favicon-32x32.png"
       healthCheck:
           enabled: true
           type: "http"
           url: "http://nas.internal.sakanano.moe:8123"
           interval: 60
           timeout: 5
-      
+
     - id: "wewerss"
       type: "service"
       title: "WeweRSS"
@@ -264,18 +263,14 @@ items:
       description: "公众号文章转 RSS 服务"
       tags: ["nas", "自动化"]
       icon:
-        type: "url"
-        value: "https://raw.githubusercontent.com/cooderl/wewe-rss/refs/heads/main/assets/logo.png"
+          type: "url"
+          value: "https://raw.githubusercontent.com/cooderl/wewe-rss/refs/heads/main/assets/logo.png"
       healthCheck:
           enabled: true
           type: "http"
           url: "http://macmini.internal.sakanano.moe:4000"
           interval: 60
           timeout: 5
-
-  
-
-
 
     # 清单管理类
     # - id: "tech-learning"
@@ -416,8 +411,8 @@ items:
       description: "离职注意事项"
       tags: ["工作"]
       icon:
-        type: "emoji"
-        value: "💼"
+          type: "emoji"
+          value: "💼"
       items:
           # 离职谈判与手续
           - id: "resignation-category"
@@ -444,7 +439,7 @@ items:
             text: "确认过渡期工作安排和到岗要求"
             completed: false
             indent: 1
-        
+
           # 经济补偿与福利
           - id: "compensation-category"
             text: "经济补偿与福利"
@@ -474,7 +469,7 @@ items:
             text: "年假、调休假等假期折现"
             completed: false
             indent: 1
-          
+
           # 公司福利处理
           - id: "benefits-category"
             text: "公司福利处理"
@@ -504,7 +499,7 @@ items:
             text: "开通员工专属折扣服务"
             completed: false
             indent: 1
-          
+
           # 证明文件与材料
           - id: "documents-category"
             text: "证明文件与材料"
@@ -526,7 +521,7 @@ items:
             text: "员工卡扫描件和工作证明备份"
             completed: false
             indent: 1
-          
+
           # 趁在职办理事项
           - id: "opportunity-category"
             text: "趁在职办理事项"
@@ -548,7 +543,7 @@ items:
             text: "完成职场社交平台员工认证"
             completed: false
             indent: 1
-          
+
           # 物品与纪念品
           - id: "items-category"
             text: "物品与纪念品"
@@ -570,7 +565,7 @@ items:
             text: "办公环境拍照留念"
             completed: false
             indent: 1
-          
+
           # 内部沟通
           - id: "communication-category"
             text: "内部沟通"
@@ -592,7 +587,7 @@ items:
             text: "移交账号权限"
             completed: false
             indent: 1
-          
+
           # 注意事项
           - id: "notes-category"
             text: "注意事项"
@@ -629,7 +624,7 @@ items:
     #         text: "主要任务一"
     #         completed: false
     #         isHeader: true
-          
+
     #       # 第一个小标题下的任务
     #       - id: "sub-task-1-1"
     #         text: "子任务 1.1"
@@ -639,7 +634,7 @@ items:
     #         text: "子任务 1.2"
     #         completed: false
     #         indent: 1
-          
+
     #       # 第二个小标题下的子任务
     #       - id: "header-1-2"
     #         text: "子任务 1.2 的详细步骤"
@@ -654,13 +649,13 @@ items:
     #         text: "子子任务 1.2.2"
     #         completed: false
     #         indent: 2
-          
+
     #       # 第二个主要小标题
     #       - id: "header-2"
     #         text: "主要任务二"
     #         completed: false
     #         isHeader: true
-          
+
     #       # 第二个主要小标题下的任务
     #       - id: "sub-task-2-1"
     #         text: "子任务 2.1"
