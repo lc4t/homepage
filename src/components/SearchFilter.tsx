@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { Item, Config } from '@/types/config';
-import { useTheme } from './ThemeProvider';
 
 interface SearchFilterProps {
   items: Item[];
@@ -20,17 +19,10 @@ export function SearchFilter({
   onSearchChange,
   onTagsChange
 }: SearchFilterProps) {
-  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [allTags, setAllTags] = useState<string[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   
-  // 客户端挂载检测
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // 提取所有标签并排序
   useEffect(() => {
     const tags = Array.from(new Set(items.flatMap(item => item.tags)));
@@ -49,10 +41,10 @@ export function SearchFilter({
       const others = tags.filter(tag => !pinnedTags.includes(tag)).sort();
       
       // 合并两组标签
-      setAllTags([...pinned, ...others]);
+      setAvailableTags([...pinned, ...others]);
     } else {
       // 没有配置pinnedTags，按字母顺序排序
-      setAllTags(tags.sort());
+      setAvailableTags(tags.sort());
     }
   }, [items, config]);
 
@@ -145,7 +137,7 @@ export function SearchFilter({
           <span>标签:</span>
         </div>
         
-        {allTags.map((tag) => {
+        {availableTags.map((tag) => {
           const isSelected = selectedTags.includes(tag);
           const isPinned = config?.layout.pinnedTags?.includes(tag);
           const count = items.filter(item => item.tags.includes(tag)).length;
@@ -174,13 +166,17 @@ export function SearchFilter({
       {(searchQuery || selectedTags.length > 0) && (
         <div className="mt-3 text-sm" style={{color: 'var(--text-tertiary)'}}>
           {searchQuery && (
-            <span>搜索: "{searchQuery}" </span>
+            <span>搜索: &quot;{searchQuery}&quot; </span>
           )}
           {selectedTags.length > 0 && (
             <span>标签: {selectedTags.join(', ')}</span>
           )}
         </div>
       )}
+
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        使用 &quot;,&quot; 分隔多个标签
+      </div>
     </div>
   );
 }

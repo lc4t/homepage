@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChecklistItemConfig, ChecklistItem as ChecklistItemType } from '@/types/config';
-import { ChecklistManager, exportToMarkdown } from '@/lib/config';
+import { ChecklistItemConfig } from '@/types/config';
+import { ChecklistManager } from '@/lib/config';
 import { X, Download, Check } from 'lucide-react';
 
 interface ChecklistModalProps {

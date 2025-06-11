@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { IconConfig } from '@/types/config';
+import Image from 'next/image';
 
 interface IconProps {
   // 图标配置（推荐对象格式，兼容字符串路径）
@@ -27,14 +28,12 @@ export function IconComponent({
   className = ''
 }: IconProps) {
   const [imageError, setImageError] = useState(false);
-  const [svgContent, setSvgContent] = useState<string | null>(null);
   const [faviconAttempts, setFaviconAttempts] = useState<string[]>([]);
   const [currentFaviconIndex, setCurrentFaviconIndex] = useState(0);
 
   // 重置错误状态当icon改变时
   useEffect(() => {
     setImageError(false);
-    setSvgContent(null);
     setFaviconAttempts([]);
     setCurrentFaviconIndex(0);
   }, [icon, url]);
@@ -136,29 +135,6 @@ export function IconComponent({
     return paramString ? `${url}?${paramString}` : url;
   };
 
-  // 处理favicon加载失败，尝试下一个
-  const handleFaviconError = () => {
-    if (iconConfig?.type === 'favicon' && url) {
-      const urls = getFaviconUrls(url);
-      
-      if (faviconAttempts.length === 0) {
-        setFaviconAttempts(urls);
-        setCurrentFaviconIndex(0);
-        return;
-      }
-      
-      const nextIndex = currentFaviconIndex + 1;
-      if (nextIndex < faviconAttempts.length) {
-        setCurrentFaviconIndex(nextIndex);
-        setImageError(false);
-      } else {
-        setImageError(true);
-      }
-    } else {
-      setImageError(true);
-    }
-  };
-
   // 主渲染函数
   const renderIcon = (): React.ReactNode => {
     if (!iconConfig) {
@@ -214,14 +190,12 @@ export function IconComponent({
     }
     
     return (
-      <img 
+      <Image
         src={imagePath}
-        alt={title}
+        alt={title || 'Icon'}
         width={size}
         height={size}
         className={`rounded-lg object-cover ${className}`}
-        onError={() => setImageError(true)}
-        style={{ width: size, height: size }}
       />
     );
   };
@@ -251,14 +225,12 @@ export function IconComponent({
     }
     
     return (
-      <img 
+      <Image
         src={faviconUrl}
-        alt={title}
+        alt={title || 'Favicon'}
         width={size}
         height={size}
         className={`rounded-lg object-cover ${className}`}
-        onError={handleFaviconError}
-        style={{ width: size, height: size }}
       />
     );
   };
@@ -269,8 +241,7 @@ export function IconComponent({
     if (iconConfig?.svg) {
       return (
         <div 
-          className={`flex items-center justify-center ${className}`}
-          style={{ width: size, height: size }}
+          className={`${className} flex items-center justify-center`}
           dangerouslySetInnerHTML={{ __html: iconConfig.svg }}
         />
       );
@@ -292,11 +263,10 @@ export function IconComponent({
     }
     
     return (
-      <img 
+      <Image
         src={badgeUrl}
         alt={title}
         className={`rounded ${className}`}
-        onError={() => setImageError(true)}
         style={{ height: size * 0.6, maxWidth: size * 2 }}
       />
     );

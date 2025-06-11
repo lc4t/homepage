@@ -31,7 +31,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
         html.classList.remove('dark');
         html.setAttribute('data-theme', 'light');
       }
-    } catch (error) {
+    } catch {
       // 静默处理错误
     }
   }, [theme, mounted]);

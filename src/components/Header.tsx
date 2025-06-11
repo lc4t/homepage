@@ -29,8 +29,8 @@ export function Header({ siteConfig }: HeaderProps) {
   };
 
   const themeButtonClass = mounted 
-    ? 'p-3 rounded-xl backdrop-blur-[10px] border transition-all apple-card'
-    : 'p-3 rounded-xl backdrop-blur-[10px] border transition-all bg-white/10 border-white/20';
+    ? 'p-3 rounded-xl backdrop-blur-[10px] border transition-all h-12 w-12 flex items-center justify-center'
+    : 'p-3 rounded-xl backdrop-blur-[10px] border transition-all bg-white/10 border-white/20 h-12 w-12 flex items-center justify-center';
 
   // 渲染个人链接图标
   const renderLinks = () => {
@@ -129,12 +129,6 @@ interface SimpleHeaderProps {
 }
 
 export function SimpleHeader({ title, onBack, actions }: SimpleHeaderProps) {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  
   return (
     <header className="relative z-20 p-4" style={{borderBottom: '1px solid var(--border-primary)'}}>
       <div className="flex items-center justify-between">

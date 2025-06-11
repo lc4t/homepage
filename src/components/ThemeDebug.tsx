@@ -33,7 +33,7 @@ export function ThemeDebug() {
         htmlClasses: className
       });
     }
-  }, []);
+  }, [theme]);
   
   // 当主题变化时更新状态
   useEffect(() => {
@@ -57,6 +57,10 @@ export function ThemeDebug() {
       });
     }
   }, [theme, isMounted]);
+  
+  useEffect(() => {
+    console.log('Current theme:', theme);
+  }, [theme]);
   
   const handleForceToggle = () => {
     if (!isMounted) return;

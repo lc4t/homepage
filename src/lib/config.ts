@@ -1,5 +1,5 @@
 import yaml from 'js-yaml';
-import { Config, ServiceStatus, ChecklistState } from '@/types/config';
+import { Config, ServiceStatus, ChecklistState, Item, SharedListItemConfig, ChecklistItemConfig, SharedListItem, ChecklistItem } from '@/types/config';
 
 // 默认配置
 const DEFAULT_CONFIG: Partial<Config> = {
@@ -159,7 +159,7 @@ export class ChecklistManager {
 
 // 导出为Markdown
 export function exportToMarkdown(
-  items: any[], 
+  items: Item[], 
   tag?: string, 
   template?: string,
   itemFormat?: string
@@ -174,38 +174,46 @@ export function exportToMarkdown(
   const itemsText = filteredItems
     .map(item => {
       // 处理不同类型的项目
-      if (item.type === 'sharedlist' && item.items && item.items.length > 0) {
-        // 分享列表类型，导出所有链接
-        const listHeader = format
-          .replace('{title}', item.title)
-          .replace('{url}', '#')
-          .replace('{description}', item.description);
-        
-        const links = item.items.map((link: any) => 
-          `  - [${link.text}](${link.url})`
-        ).join('\n');
-        
-        return `${listHeader}\n${links}`;
-      } else if (item.type === 'checklist' && item.items && item.items.length > 0) {
-        // 清单类型，导出所有项目
-        const listHeader = format
-          .replace('{title}', item.title)
-          .replace('{url}', '#')
-          .replace('{description}', item.description);
-        
-        const tasks = item.items.map((task: any) => 
-          `  - [${task.completed ? 'x' : ' '}] ${task.text}`
-        ).join('\n');
-        
-        return `${listHeader}\n${tasks}`;
+      if (item.type === 'sharedlist') {
+        const sharedListItem = item as SharedListItemConfig;
+        if (sharedListItem.items && sharedListItem.items.length > 0) {
+          // 分享列表类型，导出所有链接
+          const listHeader = format
+            .replace('{title}', sharedListItem.title)
+            .replace('{url}', '#')
+            .replace('{description}', sharedListItem.description);
+          
+          const links = sharedListItem.items.map((link: SharedListItem) => 
+            `  - [${link.text}](${link.url})`
+          ).join('\n');
+          
+          return `${listHeader}\n${links}`;
+        }
+      } else if (item.type === 'checklist') {
+        const checklistItem = item as ChecklistItemConfig;
+        if (checklistItem.items && checklistItem.items.length > 0) {
+          // 清单类型，导出所有项目
+          const listHeader = format
+            .replace('{title}', checklistItem.title)
+            .replace('{url}', '#')
+            .replace('{description}', checklistItem.description);
+          
+          const tasks = checklistItem.items.map((task: ChecklistItem) => 
+            `  - [${task.completed ? 'x' : ' '}] ${task.text}`
+          ).join('\n');
+          
+          return `${listHeader}\n${tasks}`;
+        }
       } else {
         // 普通项目
         return format
           .replace('{title}', item.title)
-          .replace('{url}', item.url || '#')
+          .replace('{url}', 'url' in item ? (item as { url: string }).url : '#')
           .replace('{description}', item.description);
       }
+      return '';
     })
+    .filter(Boolean)
     .join('\n\n');
   
   if (tag && template) {
@@ -230,31 +238,59 @@ export class HealthChecker {
     };
   }
   
-  static async checkService(url: string): Promise<'online' | 'offline'> {
+  static async checkService(url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number): Promise<'online' | 'offline'> {
     // 只在浏览器环境下运行
     if (typeof window === 'undefined') {
-      return 'unknown' as any;
+      return 'offline';
     }
     
     try {
-      // 使用fetch检查服务（受CORS限制）
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(url, {
-        method: 'HEAD',
-        mode: 'no-cors',
-        signal: controller.signal,
-      });
-      
-      clearTimeout(timeoutId);
-      return 'online';
+      if (type === 'tcp' && host && port) {
+        // TCP 检查 - 使用 fetch 尝试连接端口
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        try {
+          // 尝试连接端口
+          const response = await fetch(`http://${host}:${port}`, {
+            method: 'HEAD',
+            mode: 'no-cors',
+            signal: controller.signal,
+          });
+          
+          // 只要能连接就认为端口是开放的
+          clearTimeout(timeoutId);
+          return 'online';
+        } catch (error) {
+          // 如果是 CORS 错误，说明端口是开放的
+          if (error instanceof TypeError && error.message.includes('CORS')) {
+            clearTimeout(timeoutId);
+            return 'online';
+          }
+          // 其他错误（如连接被拒绝）说明端口未开放
+          clearTimeout(timeoutId);
+          return 'offline';
+        }
+      } else {
+        // HTTP 检查
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        await fetch(url, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        return 'online';
+      }
     } catch {
       return 'offline';
     }
   }
   
-  static startChecking(itemId: string, url: string, interval: number = 60): void {
+  static startChecking(itemId: string, url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number, interval: number = 60): void {
     // 只在浏览器环境下运行
     if (typeof window === 'undefined') {
       return;
@@ -264,11 +300,11 @@ export class HealthChecker {
     this.stopChecking(itemId);
     
     // 立即执行一次检查
-    this.performCheck(itemId, url);
+    this.performCheck(itemId, url, type, host, port);
     
     // 设置定期检查
     const intervalId = window.setInterval(() => {
-      this.performCheck(itemId, url);
+      this.performCheck(itemId, url, type, host, port);
     }, interval * 1000);
     
     this.intervals.set(itemId, intervalId);
@@ -282,7 +318,7 @@ export class HealthChecker {
     }
   }
   
-  private static async performCheck(itemId: string, url: string): Promise<void> {
+  private static async performCheck(itemId: string, url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number): Promise<void> {
     this.checks.set(itemId, {
       id: itemId,
       status: 'checking',
@@ -290,7 +326,7 @@ export class HealthChecker {
     });
     
     const startTime = Date.now();
-    const status = await this.checkService(url);
+    const status = await this.checkService(url, type, host, port);
     const responseTime = Date.now() - startTime;
     
     this.checks.set(itemId, {

@@ -132,7 +132,7 @@ export function Background({ config }: BackgroundProps) {
       
       {/* 加载状态 - 默认渐变背景 */}
       {!isLoaded && (
-        <div className="fixed inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 animate-pulse" />
+        <div className="fixed inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black animate-pulse" />
       )}
     </>
   );
@@ -163,13 +163,7 @@ interface BackgroundSelectorProps {
 export function BackgroundSelector({ current, onChange }: BackgroundSelectorProps) {
   const { theme } = useTheme();
   const [customValue, setCustomValue] = useState(current.value);
-  const [mounted, setMounted] = useState(false);
   
-  // 客户端挂载检测
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const handleTypeChange = (type: AppearanceConfig['background']['type']) => {
     let defaultValue = '';
     

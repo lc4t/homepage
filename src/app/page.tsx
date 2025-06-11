@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Config, Item, ChecklistItemConfig, SharedListItemConfig } from '@/types/config';
+import { Config, Item, ChecklistItemConfig, SharedListItemConfig, ServiceItem } from '@/types/config';
 import { loadConfig, HealthChecker } from '@/lib/config';
 import { Background } from '@/components/Background';
 import { Header } from '@/components/Header';
@@ -11,7 +11,7 @@ import { ChecklistModal } from '@/components/ChecklistModal';
 import { SharedListModal } from '@/components/SharedListModal';
 import { FloatingExportButton } from '@/components/FloatingExportButton';
 import { FaviconHandler } from '@/components/FaviconHandler';
-import { useTheme } from '@/components/ThemeProvider';
+import Image from 'next/image';
 
 export default function HomePage() {
   const [config, setConfig] = useState<Config | null>(null);
@@ -50,20 +50,29 @@ export default function HomePage() {
 
     // 启动服务健康检查
     config.items.forEach(item => {
-      if (item.type === 'service' && item.healthCheck?.enabled && 'url' in item) {
-        HealthChecker.startChecking(
-          item.id, 
-          item.healthCheck.url || item.url,
-          item.healthCheck.interval
-        );
+      if (item.type === 'service') {
+        const serviceItem = item as ServiceItem;
+        if (serviceItem.healthCheck?.enabled) {
+          HealthChecker.startChecking(
+            serviceItem.id, 
+            serviceItem.healthCheck.url || serviceItem.url,
+            serviceItem.healthCheck.type,
+            serviceItem.healthCheck.host,
+            serviceItem.healthCheck.port,
+            serviceItem.healthCheck.interval
+          );
+        }
       }
     });
 
     // 清理函数：停止健康检查
     return () => {
       config.items.forEach(item => {
-        if (item.type === 'service' && item.healthCheck?.enabled) {
-          HealthChecker.stopChecking(item.id);
+        if (item.type === 'service') {
+          const serviceItem = item as ServiceItem;
+          if (serviceItem.healthCheck?.enabled) {
+            HealthChecker.stopChecking(serviceItem.id);
+          }
         }
       });
     };
@@ -170,7 +179,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen relative">
       {/* 动态设置favicon */}
-      <FaviconHandler />
+      <FaviconHandler siteConfig={config.site} />
       
       {/* 背景 */}
       <Background config={config.appearance.background} />
@@ -255,6 +264,17 @@ export default function HomePage() {
           />
         </>
       )}
+
+      <div className="flex items-center justify-center">
+        <Image
+          src="/avatar.png"
+          alt="Avatar"
+          width={120}
+          height={120}
+          className="rounded-full"
+          priority
+        />
+      </div>
     </main>
   );
 }

@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Item, ServiceItem, Config } from '@/types/config';
+import { Item, Config, ChecklistItemConfig, SharedListItemConfig, ServiceItem } from '@/types/config';
 import { HealthChecker, ChecklistManager } from '@/lib/config';
-import { CheckSquare, Link } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { IconComponent } from './IconComponent';
+import { CheckCircle2, XCircle, Clock, ListChecks, Share2 } from 'lucide-react';
 
 interface ItemCardProps {
   item: Item;
@@ -15,10 +15,10 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = '' }: ItemCardProps) {
-  const { theme } = useTheme(); // 获取当前主题
-  const [progress, setProgress] = useState<{completed: number; total: number} | null>(null);
-  const [iconError, setIconError] = useState(false);
+  const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [status, setStatus] = React.useState<'online' | 'offline' | 'checking' | 'unknown'>('unknown');
+  const [checklistProgress, setChecklistProgress] = React.useState<{ completed: number; total: number }>({ completed: 0, total: 0 });
   
   // 客户端挂载检测
   useEffect(() => {
@@ -28,77 +28,76 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
   // 获取清单进度
   useEffect(() => {
     if (item.type === 'checklist') {
-      const progressData = ChecklistManager.getProgress(item.id, item.items.length);
-      setProgress(progressData);
+      const checklistItem = item as ChecklistItemConfig;
+      if (checklistItem.items) {
+        const progressData = ChecklistManager.getProgress(checklistItem.id, checklistItem.items.length);
+        setChecklistProgress(progressData);
+      }
+    }
+  }, [item]);
+
+  // 获取服务状态
+  useEffect(() => {
+    if (item.type === 'service') {
+      const serviceItem = item as ServiceItem;
+      const checkStatus = () => {
+        const status = HealthChecker.getStatus(serviceItem.id);
+        setStatus(status.status);
+      };
+      checkStatus();
+      const interval = setInterval(checkStatus, 30000);
+      return () => clearInterval(interval);
     }
   }, [item]);
 
   const handleClick = () => {
-    // 如果是清单类型，打开清单弹窗
     if (item.type === 'checklist' && onOpenChecklist) {
       onOpenChecklist(item);
-      return;
-    }
-    
-    // 如果是分享列表类型，打开分享列表弹窗
-    if (item.type === 'sharedlist' && onOpenSharedList) {
+    } else if (item.type === 'sharedlist' && onOpenSharedList) {
       onOpenSharedList(item);
-      return;
-    }
-    
-    // 如果是网站或服务类型，跳转到URL
-    if ((item.type === 'website' || item.type === 'service' || 'url' in item) && 'url' in item) {
-      window.open(item.url, '_blank');
+    } else if (item.type === 'website' || item.type === 'service') {
+      const url = 'url' in item ? (item as { url: string }).url : undefined;
+      if (url) {
+        window.open(url, '_blank');
+      }
     }
   };
 
   const getStatusIndicator = () => {
-    // 如果是服务类型，显示服务状态
-    if (item.type === 'service') {
-      const status = HealthChecker.getStatus(item.id);
-      
-      if (!status) return null;
-      
-      const color = 
-        status.status === 'online' ? '#10b981' :  // 绿色
-        status.status === 'offline' ? '#ef4444' : // 红色
-        status.status === 'checking' ? '#f59e0b' : // 黄色
-        '#6b7280'; // 灰色
-      
-      const title = 
-        status.status === 'online' ? '在线' :
-        status.status === 'offline' ? '离线' :
-        status.status === 'checking' ? '检查中' :
-        '未知';
-      
-      return (
-        <div 
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: color }}
-          title={title}
-        />
-      );
+    if (item.type !== 'service') return null;
+
+    switch (status) {
+      case 'online':
+        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      case 'offline':
+        return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'checking':
+        return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />;
+      default:
+        return null;
     }
-    
-    return null;
   };
 
   const getProgressInfo = () => {
-    if (item.type === 'checklist' && progress) {
-      return `${progress.completed}/${progress.total}`;
+    if (item.type === 'checklist') {
+      const checklistItem = item as ChecklistItemConfig;
+      if (checklistItem.items) {
+        return `${checklistProgress.completed}/${checklistProgress.total}`;
+      }
+    } else if (item.type === 'sharedlist') {
+      const sharedListItem = item as SharedListItemConfig;
+      if (sharedListItem.items) {
+        return `${sharedListItem.items.length} 个链接`;
+      }
     }
-    
-    if (item.type === 'sharedlist' && 'items' in item) {
-      return `${item.items.length} 链接`;
-    }
-    
     return null;
   };
 
   // 获取项目URL（如果存在）
   const getItemUrl = (item: Item): string | undefined => {
     if ('url' in item) {
-      return item.url;
+      const urlItem = item as { url: string };
+      return urlItem.url;
     }
     return undefined;
   };
@@ -133,10 +132,10 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
           <div className="ml-2">
             {getStatusIndicator()}
             {item.type === 'checklist' && (
-              <CheckSquare className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
+              <ListChecks className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
             )}
             {item.type === 'sharedlist' && (
-              <Link className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
+              <Share2 className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
             )}
           </div>
         </div>

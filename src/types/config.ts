@@ -147,7 +147,7 @@ export interface SharedListItemConfig extends BaseItem {
 
 // 其他类型项目
 export interface CustomItemConfig extends BaseItem {
-  [key: string]: any; // 允许任意额外属性
+  [key: string]: string | number | boolean | string[] | IconConfig | HealthCheckConfig | undefined; // 允许任意额外属性，但限制类型
 }
 
 // 联合项目类型

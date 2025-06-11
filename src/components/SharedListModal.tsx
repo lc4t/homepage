@@ -3,7 +3,7 @@
 import React from 'react';
 import { X, ExternalLink, ClipboardCopy } from 'lucide-react';
 import { SharedListItemConfig } from '@/types/config';
-import { useTheme } from './ThemeProvider';
+import { IconComponent } from './IconComponent';
 
 interface SharedListModalProps {
   item: SharedListItemConfig | null;
@@ -11,9 +11,6 @@ interface SharedListModalProps {
 }
 
 export function SharedListModal({ item, onClose }: SharedListModalProps) {
-  const { theme } = useTheme();
-  
-  // 如果没有选中的列表，不显示
   if (!item) return null;
 
   // 复制所有链接到剪贴板
@@ -57,7 +54,11 @@ export function SharedListModal({ item, onClose }: SharedListModalProps) {
         <div className="flex items-center justify-between p-4 border-b" style={{borderColor: 'var(--border-secondary)'}}>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white">
-              {item.icon || '🔗'}
+              <IconComponent
+                icon={item.icon}
+                title={item.title}
+                size={24}
+              />
             </div>
             <h2 className="text-lg font-medium" style={{color: 'var(--text-primary)'}}>
               {item.title}
