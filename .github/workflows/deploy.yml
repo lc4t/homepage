@@ -37,7 +37,8 @@ jobs:
         run: npm run build
         env:
           NEXT_OUTPUT: export
-          GITHUB_ACTIONS: true
+          # 不再需要 GITHUB_ACTIONS 环境变量来设置路径前缀
+          USE_CUSTOM_DOMAIN: true
           
       - name: Add production build identifier
         run: |

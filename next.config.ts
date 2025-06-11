@@ -24,9 +24,10 @@ const nextConfig: NextConfig = {
   // 禁用服务端功能
   trailingSlash: true,
   
-  // 基础路径配置（GitHub Pages需要）
-  basePath: process.env.GITHUB_ACTIONS ? '/homepage' : '',
-  assetPrefix: process.env.GITHUB_ACTIONS ? '/homepage/' : '',
+  // 基础路径配置
+  // 当使用自定义域名时，不需要 basePath 和 assetPrefix
+  basePath: '',
+  assetPrefix: '',
   
   // 构建配置
   distDir: 'out',
