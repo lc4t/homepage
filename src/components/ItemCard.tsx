@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Item, ServiceItem, Config } from '@/types/config';
-import { HealthChecker, ChecklistManager, getFaviconUrl } from '@/lib/config';
+import { HealthChecker, ChecklistManager } from '@/lib/config';
 import { CheckSquare, Link } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
+import { IconComponent } from './IconComponent';
 
 interface ItemCardProps {
   item: Item;
@@ -94,52 +95,12 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
     return null;
   };
 
-  // 渲染图标的函数
-  const renderIcon = (item: Item, iconError: boolean, setIconError: (error: boolean) => void) => {
-    // 如果有自定义图标且不是 URL，则显示为 emoji 或文本
-    if (item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('/')) {
-      return (
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
-          {item.icon}
-        </div>
-      );
+  // 获取项目URL（如果存在）
+  const getItemUrl = (item: Item): string | undefined => {
+    if ('url' in item) {
+      return item.url;
     }
-    
-    // 如果是网站或服务类型，尝试获取favicon
-    if ((item.type === 'website' || item.type === 'service') && 'url' in item) {
-      // 使用自定义图标或尝试获取favicon
-      const iconUrl = item.icon || getFaviconUrl(item.url);
-      
-      if (!iconError) {
-        return (
-          <img 
-            src={iconUrl}
-            alt={item.title}
-            className="w-8 h-8 rounded-lg object-cover"
-            onError={() => setIconError(true)}
-          />
-        );
-      }
-    }
-    
-    // 如果有自定义图标且是 URL且没有加载错误
-    if (item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/')) && !iconError) {
-      return (
-        <img 
-          src={item.icon}
-          alt={item.title}
-          className="w-8 h-8 rounded-lg object-cover"
-          onError={() => setIconError(true)}
-        />
-      );
-    }
-    
-    // 否则显示默认图标（首字母）
-    return (
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
-        {item.title.charAt(0).toUpperCase()}
-      </div>
-    );
+    return undefined;
   };
 
   // 在服务器端或客户端首次渲染时使用基本样式
@@ -152,11 +113,17 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
       onClick={handleClick}
       data-theme={mounted ? theme : undefined}
     >
-      <div className="p-6">
+      <div className="p-6 h-full flex flex-col">
         {/* 图标和标题并排 */}
         <div className="flex items-center mb-3">
           <div className="mr-3">
-            {renderIcon(item, iconError, setIconError)}
+            <IconComponent
+              icon={item.icon}
+              title={item.title}
+              url={getItemUrl(item)}
+              itemType={item.type}
+              size={32}
+            />
           </div>
           
           <h3 className="text-white font-medium text-sm flex-grow" style={{color: 'var(--text-primary)'}}>
@@ -174,12 +141,12 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
           </div>
         </div>
 
-        {/* 描述 - 完整显示 */}
-        <p className="text-xs mb-4 leading-relaxed" style={{color: 'var(--text-secondary)'}}>
+        {/* 描述 - 自动填充剩余空间 */}
+        <p className="text-xs leading-relaxed flex-1 mb-4" style={{color: 'var(--text-secondary)'}}>
           {item.description}
         </p>
 
-        {/* 底部信息 */}
+        {/* 底部信息 - 始终在底部对齐 */}
         <div className="flex flex-wrap gap-1.5 mt-auto">
           {/* 标签 - 完整显示所有标签 */}
           {item.tags.map((tag, index) => (
@@ -291,7 +258,7 @@ export function ItemGrid({ items, onOpenChecklist, onOpenSharedList, className =
             </h2>
             <div className={`
               grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 
-              gap-4 ${className}
+              gap-4 auto-rows-fr ${className}
             `}>
               {groupedByType[type].items.map((item) => (
                 <ItemCard 

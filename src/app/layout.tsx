@@ -1,13 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClientLayout } from "@/components/ClientLayout";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+// 暂时使用系统字体避免 Turbopack 字体问题
+// const inter = Inter({
+//   subsets: ["latin"],
+//   variable: "--font-inter",
+//   display: "swap",
+//   preload: true,
+// });
 
 export const metadata: Metadata = {
   title: "个人导航站",
@@ -28,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="h-full">
-      <body className={`${inter.variable} font-sans antialiased h-full`}>
+      <body className="font-sans antialiased h-full">
         <ThemeProvider>
           <ClientLayout>
             {children}

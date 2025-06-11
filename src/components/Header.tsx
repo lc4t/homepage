@@ -1,16 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Sunrise, Github, Globe, ExternalLink } from 'lucide-react';
+import { Sun, Moon, Github, Globe, ExternalLink } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { SiteConfig } from '@/types/config';
+import { IconComponent } from './IconComponent';
 
 interface HeaderProps {
   siteConfig: SiteConfig;
 }
 
 export function Header({ siteConfig }: HeaderProps) {
-  const { theme, toggleTheme, autoTheme, setAutoTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -18,43 +19,17 @@ export function Header({ siteConfig }: HeaderProps) {
   }, []);
 
   const getThemeIcon = () => {
-    if (autoTheme) {
-      return <Sunrise className="w-5 h-5" />;
-    }
     return theme === 'dark' 
       ? <Moon className="w-5 h-5" /> 
       : <Sun className="w-5 h-5" />;
   };
 
   const getThemeTitle = () => {
-    if (autoTheme) {
-      return '自动主题 (根据时间)';
-    }
-    return theme === 'dark' ? '深色主题' : '浅色主题';
-  };
-
-  const handleThemeClick = () => {
-    if (autoTheme) {
-      // 如果是自动模式，切换到手动模式
-      setAutoTheme(false);
-    } else {
-      // 手动切换主题
-      toggleTheme();
-    }
-  };
-
-  const handleThemeRightClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // 右键点击切换自动模式
-    setAutoTheme(!autoTheme);
+    return theme === 'dark' ? '切换到浅色主题' : '切换到深色主题';
   };
 
   const themeButtonClass = mounted 
-    ? `p-3 rounded-xl backdrop-blur-[10px] border transition-all ${
-        autoTheme 
-          ? 'bg-orange-500/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/30' 
-          : 'apple-card'
-      }`
+    ? 'p-3 rounded-xl backdrop-blur-[10px] border transition-all apple-card'
     : 'p-3 rounded-xl backdrop-blur-[10px] border transition-all bg-white/10 border-white/20';
 
   // 渲染个人链接图标
@@ -97,7 +72,13 @@ export function Header({ siteConfig }: HeaderProps) {
             title={link.name}
           >
             {link.icon ? (
-              <span className="text-base sm:text-lg">{link.icon}</span>
+              <IconComponent
+                icon={link.icon}
+                title={link.name}
+                url={link.url}
+                size={20}
+                className="w-4 h-4 sm:w-5 sm:h-5"
+              />
             ) : (
               <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
             )}
@@ -125,12 +106,10 @@ export function Header({ siteConfig }: HeaderProps) {
           </div>
         </div>
 
-        {/* 操作按钮 - 在移动端隐藏 */}
+        {/* 主题切换按钮 - 在移动端隐藏 */}
         <div className="hidden md:flex items-center gap-3">
-          {/* 主题切换按钮 */}
           <button
-            onClick={handleThemeClick}
-            onContextMenu={handleThemeRightClick}
+            onClick={toggleTheme}
             className={themeButtonClass}
             title={getThemeTitle()}
           >
@@ -138,13 +117,6 @@ export function Header({ siteConfig }: HeaderProps) {
           </button>
         </div>
       </div>
-
-      {/* 主题提示 - 在移动端隐藏 */}
-      {mounted && autoTheme && (
-        <div className="absolute top-20 right-6 bg-orange-500/20 backdrop-blur-[10px] border border-orange-500/30 rounded-lg px-3 py-2 text-orange-200 text-sm hidden md:block">
-          🌅 自动主题模式
-        </div>
-      )}
     </header>
   );
 }

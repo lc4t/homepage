@@ -1,370 +1,409 @@
-# 完整测试配置 - 包含各种类型和功能测试
+# 完整测试配置 - 统一使用对象格式图标
 site:
-  title: "我的导航站"
-  description: "Personal Navigation Hub"
-  author: "Your Name"
-  analytics: "" # Google Analytics ID，留空则不启用
-  # 网站图标（支持相对路径或绝对URL）
-  favicon: "/favicon.png"
-  # 个人链接
-  links:
-    github: "https://github.com/yourusername"
-    blog: "https://yourblog.com"
-    custom:
-      - name: "Twitter"
-        url: "https://twitter.com/yourusername"
-        icon: "🐦"
-      - name: "LinkedIn"
-        url: "https://linkedin.com/in/yourusername"
-        icon: "💼"
+    title: "HomePage"
+    description: "一个完全 AI 驱动的导航分享站"
+    author: "lc4t"
+    analytics: "" # Google Analytics ID，留空则不启用
+    # 网站图标（支持相对路径或绝对URL）
+    favicon: "/favicon.png"
+    # 个人链接
+    links:
+        github: "https://github.com/lc4t/homepage"
+        blog: "https://blog.sakanano.moe"
+        custom:
+            - name: "Github"
+              url: "https://github.com/lc4t"
+              icon:
+                  type: "emoji"
+                  value: "😄"
 
 # 外观配置
 appearance:
-  theme:
-    auto: true # 是否根据时间自动切换主题
-    default: "light" # 默认主题：light/dark
-  background:
-    type: "bing" # bing/color/image/url
-    value: "today" # today/random 或者具体的日期索引
-    blur: 5 # 背景模糊程度 0-20
-    opacity: 0.8 # 背景透明度 0-1
-  card:
-    blur: 10 # 卡片背景模糊 0-20
-    opacity: 0.15 # 卡片透明度 0-1
+    theme:
+        auto: true # 是否根据时间自动切换主题
+        default: "light" # 默认主题：light/dark
+    background:
+        type: "bing" # bing/color/image/url
+        value: "today" # today/random 或者具体的日期索引
+        blur: 5 # 背景模糊程度 0-20
+        opacity: 0.8 # 背景透明度 0-1
+    card:
+        blur: 10 # 卡片背景模糊 0-20
+        opacity: 0.15 # 卡片透明度 0-1
 
 # 布局配置
 layout:
-  # 置顶项目（显示在最前面）
-  pinned:
-    - "claude-ai"
-    - "github"
-  
-  # 置顶标签（标签筛选时优先显示）
-  pinnedTags:
-    - "ai"
-    - "dev"
-    - "service"
-  
-  # 自定义分组和排序
-  groups:
-    - name: "AI工具"
-      tags: ["ai", "tool"]
-      priority: 1
-    - name: "开发工具"
-      tags: ["dev", "tool"]
-      priority: 2
-    - name: "服务监控"
-      tags: ["service", "monitor"]
-      priority: 3
-    - name: "个人清单"
-      tags: ["personal", "list"]
-      priority: 4
-  
-  # 类型分组配置 - 自定义每种类型的显示名称和排序
-  typeGroups:
-    website:
-      title: "常用网站"
-      priority: 1
-    service:
-      title: "服务监控"
-      priority: 2
-    checklist:
-      title: "任务清单"
-      priority: 3
-    sharedlist:
-      title: "分享列表"
-      priority: 4
+    # 置顶项目（显示在最前面）
+    pinned:
+        - "claude-ai"
+        - "github"
+
+    # 置顶标签（标签筛选时优先显示）
+    pinnedTags:
+        - "ai"
+        - "dev"
+        - "service"
+
+    # 自定义分组和排序
+    groups:
+        - name: "AI工具"
+          tags: ["ai", "tool"]
+          priority: 1
+        - name: "开发工具"
+          tags: ["dev", "tool"]
+          priority: 2
+        - name: "服务监控"
+          tags: ["service", "monitor"]
+          priority: 3
+        - name: "个人清单"
+          tags: ["personal", "list"]
+          priority: 4
+
+    # 类型分组配置 - 自定义每种类型的显示名称和排序
+    typeGroups:
+        website:
+            title: "常用网站"
+            priority: 1
+        service:
+            title: "服务监控"
+            priority: 2
+        checklist:
+            title: "任务清单"
+            priority: 3
+        sharedlist:
+            title: "分享列表"
+            priority: 4
 
 # 导出配置
 export:
-  markdown:
-    # 按标签导出时的模板
-    template: |
-      ## {tag}
-      
-      {items}
-    # 单个项目的格式
-    item_format: "- [{title}]({url}) - {description}"
+    markdown:
+        # 按标签导出时的模板
+        template: |
+            ## {tag}
 
-# 完整测试项目配置
+            {items}
+        # 单个项目的格式
+        item_format: "- [{title}]({url}) - {description}"
+
+# 完整测试项目配置 - 统一使用对象格式图标
 items:
-  # AI 工具类
-  - id: "claude-ai"
-    type: "website"
-    title: "Claude"
-    url: "https://claude.ai"
-    description: "Anthropic 开发的AI助手，擅长写作、编程和分析"
-    tags: ["ai", "tool"]
-    icon: "🤖"
+    # AI 工具类
+    - id: "claude-ai"
+      type: "website"
+      title: "Claude"
+      url: "https://claude.ai"
+      description: "Anthropic 开发的AI助手，擅长写作、编程和分析"
+      tags: ["ai", "tool"]
+      icon:
+          type: "emoji"
+          value: "🤖"
 
-  - id: "chatgpt"
-    type: "website"
-    title: "ChatGPT"
-    url: "https://chat.openai.com"
-    description: "OpenAI 开发的对话AI，功能强大"
-    tags: ["ai", "tool"]
-    icon: "💬"
+    - id: "chatgpt"
+      type: "website"
+      title: "ChatGPT"
+      url: "https://chat.openai.com"
+      description: "OpenAI 开发的对话AI，功能强大"
+      tags: ["ai", "tool"]
+      icon:
+          type: "emoji"
+          value: "💬"
 
-  - id: "midjourney"
-    type: "website"
-    title: "Midjourney"
-    url: "https://www.midjourney.com"
-    description: "AI图像生成工具，创作精美艺术作品"
-    tags: ["ai", "tool", "art"]
-    icon: "🎨"
+    - id: "midjourney"
+      type: "website"
+      title: "Midjourney"
+      url: "https://www.midjourney.com"
+      description: "AI图像生成工具，创作精美艺术作品"
+      tags: ["ai", "tool", "art"]
+      # 没有配置icon，自动获取favicon
 
-  # 开发工具类
-  - id: "github"
-    type: "website"
-    title: "GitHub"
-    url: "https://github.com"
-    description: "代码托管和协作平台"
-    tags: ["dev", "tool"]
-    icon: "💻"
+    # 开发工具类
+    - id: "github"
+      type: "website"
+      title: "GitHub"
+      url: "https://github.com"
+      description: "代码托管和协作平台"
+      tags: ["dev", "tool"]
+      icon:
+          type: "emoji"
+          value: "💻"
 
-  - id: "vercel"
-    type: "website"
-    title: "Vercel"
-    url: "https://vercel.com"
-    description: "现代化的前端部署平台"
-    tags: ["dev", "tool", "deploy"]
-    icon: "⚡"
+    - id: "vercel"
+      type: "website"
+      title: "Vercel"
+      url: "https://vercel.com"
+      description: "现代化的前端部署平台"
+      tags: ["dev", "tool", "deploy"]
+      icon:
+          type: "emoji"
+          value: "⚡"
 
-  - id: "vscode"
-    type: "website"
-    title: "VS Code"
-    url: "https://code.visualstudio.com"
-    description: "强大的代码编辑器"
-    tags: ["dev", "tool", "editor"]
-    icon: "📝"
+    - id: "vscode"
+      type: "website"
+      title: "VS Code"
+      url: "https://code.visualstudio.com"
+      description: "强大的代码编辑器"
+      tags: ["dev", "tool", "editor"]
+      # icon:
+      #   type: "emoji"
+      #   value: "📝"
 
-  # 服务监控类（带健康检查）
-  - id: "nas-server"
-    type: "service"
-    title: "NAS服务器"
-    url: "http://192.168.1.100:5000"
-    description: "Synology NAS 管理界面"
-    tags: ["service", "monitor", "nas"]
-    icon: "🖥️"
-    healthCheck:
-      enabled: true
-      type: "http"
+    # 服务监控类（带健康检查）
+    - id: "nas-server"
+      type: "service"
+      title: "NAS服务器"
       url: "http://192.168.1.100:5000"
-      interval: 60
-      timeout: 5
+      description: "Synology NAS 管理界面"
+      tags: ["service", "monitor", "nas"]
+      icon:
+          type: "emoji"
+          value: "🖥️"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://192.168.1.100:5000"
+          interval: 60
+          timeout: 5
 
-  - id: "home-assistant"
-    type: "service"
-    title: "Home Assistant"
-    url: "http://192.168.1.101:8123"
-    description: "智能家居控制中心"
-    tags: ["service", "monitor", "smart-home"]
-    icon: "🏠"
-    healthCheck:
-      enabled: true
-      type: "http"
+    - id: "home-assistant"
+      type: "service"
+      title: "Home Assistant"
       url: "http://192.168.1.101:8123"
-      interval: 60
-      timeout: 5
+      description: "智能家居控制中心"
+      tags: ["service", "monitor", "smart-home"]
+      icon:
+          type: "emoji"
+          value: "🏠"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://192.168.1.101:8123"
+          interval: 60
+          timeout: 5
 
-  - id: "plex-server"
-    type: "service"
-    title: "Plex Media Server"
-    url: "http://192.168.1.100:32400"
-    description: "家庭媒体服务器"
-    tags: ["service", "monitor", "media"]
-    icon: "🎬"
-    healthCheck:
-      enabled: true
-      type: "http"
-      url: "http://192.168.1.100:32400/web"
-      interval: 120
-      timeout: 10
+    - id: "plex-server"
+      type: "service"
+      title: "Plex Media Server"
+      url: "http://192.168.1.100:32400"
+      description: "家庭媒体服务器"
+      tags: ["service", "monitor", "media"]
+      icon:
+          type: "emoji"
+          value: "🎬"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://192.168.1.100:32400/web"
+          interval: 120
+          timeout: 10
 
-  - id: "router"
-    type: "service"
-    title: "路由器管理"
-    url: "http://192.168.1.1"
-    description: "网络路由器配置界面"
-    tags: ["service", "monitor", "network"]
-    icon: "🌐"
-    healthCheck:
-      enabled: true
-      type: "http"
+    - id: "router"
+      type: "service"
+      title: "路由器管理"
       url: "http://192.168.1.1"
-      interval: 300
-      timeout: 10
+      description: "网络路由器配置界面"
+      tags: ["service", "monitor", "network"]
+      icon:
+          type: "emoji"
+          value: "🌐"
+      healthCheck:
+          enabled: true
+          type: "http"
+          url: "http://192.168.1.1"
+          interval: 300
+          timeout: 10
 
-  # 清单管理类
-  - id: "tech-learning"
-    type: "checklist"
-    title: "技术学习清单"
-    description: "2024年要掌握的技术栈和工具"
-    tags: ["personal", "list", "tech"]
-    icon: "📚"
-    items:
-      - id: "react-18"
-        text: "学习 React 18 新特性 (Concurrent Features)"
-        completed: true
-      - id: "typescript"
-        text: "掌握 TypeScript 高级类型系统"
-        completed: true
-      - id: "nextjs-14"
-        text: "深入 Next.js 14 App Router"
-        completed: false
-      - id: "rust"
-        text: "学习 Rust 编程语言基础"
-        completed: false
-      - id: "webassembly"
-        text: "了解 WebAssembly 应用"
-        completed: false
-      - id: "kubernetes"
-        text: "掌握 Kubernetes 容器编排"
-        completed: false
-      - id: "tailwind"
-        text: "熟练使用 Tailwind CSS"
-        completed: true
-      - id: "docker"
-        text: "深入学习 Docker 容器技术"
-        completed: true
+    # 清单管理类
+    - id: "tech-learning"
+      type: "checklist"
+      title: "技术学习清单"
+      description: "2024年要掌握的技术栈和工具"
+      tags: ["personal", "list", "tech"]
+      icon:
+          type: "emoji"
+          value: "📚"
+      items:
+          - id: "react-18"
+            text: "学习 React 18 新特性 (Concurrent Features)"
+            completed: true
+          - id: "typescript"
+            text: "掌握 TypeScript 高级类型系统"
+            completed: true
+          - id: "nextjs-14"
+            text: "深入 Next.js 14 App Router"
+            completed: false
+          - id: "rust"
+            text: "学习 Rust 编程语言基础"
+            completed: false
+          - id: "webassembly"
+            text: "了解 WebAssembly 应用"
+            completed: false
+          - id: "kubernetes"
+            text: "掌握 Kubernetes 容器编排"
+            completed: false
+          - id: "tailwind"
+            text: "熟练使用 Tailwind CSS"
+            completed: true
+          - id: "docker"
+            text: "深入学习 Docker 容器技术"
+            completed: true
 
-  # 分享列表示例
-  - id: "video-tutorials"
-    type: "sharedlist"
-    title: "视频教程合集"
-    description: "收集的各种学习视频和教程链接"
-    tags: ["video", "learning", "tutorial"]
-    icon: "🎬"
-    items:
-      - id: "nextjs-course"
-        text: "Next.js 完整教程 - 从入门到精通"
-        url: "https://www.youtube.com/watch?v=843nec-IvW0"
-      - id: "react-hooks"
-        text: "React Hooks 深度解析"
-        url: "https://www.bilibili.com/video/BV1Ge411W7Ra"
-      - id: "typescript-tutorial"
-        text: "TypeScript 实战教程"
-        url: "https://space.bilibili.com/390120104/channel/seriesdetail?sid=2695077"
-      - id: "rust-beginner"
-        text: "Rust 语言入门指南"
-        url: "https://www.youtube.com/watch?v=5C_HPTJg5ek"
-      - id: "docker-kubernetes"
-        text: "Docker 和 Kubernetes 从零开始"
-        url: "https://www.bilibili.com/video/BV1Tg411P7EB"
+    # 分享列表示例
+    - id: "video-tutorials"
+      type: "sharedlist"
+      title: "视频教程合集"
+      description: "收集的各种学习视频和教程链接"
+      tags: ["video", "learning", "tutorial"]
+      icon:
+          type: "emoji"
+          value: "🎬"
+      items:
+          - id: "nextjs-course"
+            text: "Next.js 完整教程 - 从入门到精通"
+            url: "https://www.youtube.com/watch?v=843nec-IvW0"
+          - id: "react-hooks"
+            text: "React Hooks 深度解析"
+            url: "https://www.bilibili.com/video/BV1Ge411W7Ra"
+          - id: "typescript-tutorial"
+            text: "TypeScript 实战教程"
+            url: "https://space.bilibili.com/390120104/channel/seriesdetail?sid=2695077"
+          - id: "rust-beginner"
+            text: "Rust 语言入门指南"
+            url: "https://www.youtube.com/watch?v=5C_HPTJg5ek"
+          - id: "docker-kubernetes"
+            text: "Docker 和 Kubernetes 从零开始"
+            url: "https://www.bilibili.com/video/BV1Tg411P7EB"
 
-  - id: "home-projects"
-    type: "checklist"
-    title: "家庭技术项目"
-    description: "需要完成的家庭智能化项目"
-    tags: ["personal", "list", "home"]
-    icon: "🔧"
-    items:
-      - id: "smart-lights"
-        text: "安装智能灯泡和开关"
-        completed: true
-      - id: "security-camera"
-        text: "部署安防摄像头系统"
-        completed: false
-      - id: "backup-system"
-        text: "搭建自动备份系统"
-        completed: true
-      - id: "vpn-server"
-        text: "配置家庭VPN服务器"
-        completed: false
-      - id: "network-upgrade"
-        text: "升级家庭网络设备"
-        completed: false
+    - id: "home-projects"
+      type: "checklist"
+      title: "家庭技术项目"
+      description: "需要完成的家庭智能化项目"
+      tags: ["personal", "list", "home"]
+      icon:
+          type: "emoji"
+          value: "🔧"
+      items:
+          - id: "smart-lights"
+            text: "安装智能灯泡和开关"
+            completed: true
+          - id: "security-camera"
+            text: "部署安防摄像头系统"
+            completed: false
+          - id: "backup-system"
+            text: "搭建自动备份系统"
+            completed: true
+          - id: "vpn-server"
+            text: "配置家庭VPN服务器"
+            completed: false
+          - id: "network-upgrade"
+            text: "升级家庭网络设备"
+            completed: false
 
-  - id: "reading-list"
-    type: "checklist"
-    title: "2024阅读清单"
-    description: "计划阅读的技术和管理书籍"
-    tags: ["personal", "list", "reading"]
-    icon: "📖"
-    items:
-      - id: "clean-code"
-        text: "《Clean Code》- Robert C. Martin"
-        completed: true
-      - id: "system-design"
-        text: "《Designing Data-Intensive Applications》"
-        completed: false
-      - id: "rust-book"
-        text: "《The Rust Programming Language》"
-        completed: false
-      - id: "ddd-book"
-        text: "《Domain-Driven Design》"
-        completed: false
-      - id: "microservices"
-        text: "《Building Microservices》"
-        completed: true
+    - id: "reading-list"
+      type: "checklist"
+      title: "2024阅读清单"
+      description: "计划阅读的技术和管理书籍"
+      tags: ["personal", "list", "reading"]
+      icon:
+          type: "emoji"
+          value: "📖"
+      items:
+          - id: "clean-code"
+            text: "《Clean Code》- Robert C. Martin"
+            completed: true
+          - id: "system-design"
+            text: "《Designing Data-Intensive Applications》"
+            completed: false
+          - id: "rust-book"
+            text: "《The Rust Programming Language》"
+            completed: false
+          - id: "ddd-book"
+            text: "《Domain-Driven Design》"
+            completed: false
+          - id: "microservices"
+            text: "《Building Microservices》"
+            completed: true
 
-  - id: "fitness-goals"
-    type: "checklist"
-    title: "健身目标"
-    description: "2024年健身和健康目标"
-    tags: ["personal", "list", "health"]
-    icon: "💪"
-    items:
-      - id: "gym-routine"
-        text: "建立每周3次健身房训练"
-        completed: true
-      - id: "running"
-        text: "每周跑步3次，每次5公里"
-        completed: false
-      - id: "weight-goal"
-        text: "减重10公斤"
-        completed: false
-      - id: "diet-plan"
-        text: "制定健康饮食计划"
-        completed: true
+    - id: "fitness-goals"
+      type: "checklist"
+      title: "健身目标"
+      description: "2024年健身和健康目标"
+      tags: ["personal", "list", "health"]
+      icon:
+          type: "emoji"
+          value: "💪"
+      items:
+          - id: "gym-routine"
+            text: "建立每周3次健身房训练"
+            completed: true
+          - id: "running"
+            text: "每周跑步3次，每次5公里"
+            completed: false
+          - id: "weight-goal"
+            text: "减重10公斤"
+            completed: false
+          - id: "diet-plan"
+            text: "制定健康饮食计划"
+            completed: true
 
-  # 设计和创意工具
-  - id: "figma"
-    type: "website"
-    title: "Figma"
-    url: "https://figma.com"
-    description: "协作式UI设计工具"
-    tags: ["design", "tool"]
-    icon: "🎯"
+    # 设计和创意工具
+    - id: "figma"
+      type: "website"
+      title: "Figma"
+      url: "https://figma.com"
+      description: "协作式UI设计工具"
+      tags: ["design", "tool"]
+      icon:
+          type: "emoji"
+          value: "🎯"
 
-  - id: "bing"
-    type: "website"
-    title: "Bing"
-    url: "https://www.bing.com"
-    description: "微软搜索引擎和每日精美壁纸"
-    tags: ["design", "photo"]
-    icon: "📸"
+    - id: "bing"
+      type: "website"
+      title: "Bing"
+      url: "https://www.bing.com"
+      description: "微软搜索引擎和每日精美壁纸"
+      tags: ["design", "photo"]
+      icon:
+          type: "emoji"
+          value: "📸"
 
-  # 生产力工具
-  - id: "notion"
-    type: "website"
-    title: "Notion"
-    url: "https://notion.so"
-    description: "All-in-one 工作空间"
-    tags: ["tool", "productivity"]
-    icon: "📋"
+    # 生产力工具
+    - id: "notion"
+      type: "website"
+      title: "Notion"
+      url: "https://notion.so"
+      description: "All-in-one 工作空间"
+      tags: ["tool", "productivity"]
+      icon:
+          type: "emoji"
+          value: "📋"
 
-  - id: "raycast"
-    type: "website"
-    title: "Raycast"
-    url: "https://raycast.com"
-    description: "macOS 效率启动器"
-    tags: ["tool", "productivity", "mac"]
-    icon: "🚀"
+    - id: "raycast"
+      type: "website"
+      title: "Raycast"
+      url: "https://raycast.com"
+      description: "macOS 效率启动器"
+      tags: ["tool", "productivity", "mac"]
+      icon:
+          type: "emoji"
+          value: "🚀"
 
-  # 学习资源
-  - id: "mdn"
-    type: "website"
-    title: "MDN Web Docs"
-    url: "https://developer.mozilla.org"
-    description: "Web开发权威文档"
-    tags: ["learn", "reference", "web"]
-    icon: "📚"
+    # 学习资源
+    - id: "mdn"
+      type: "website"
+      title: "MDN Web Docs"
+      url: "https://developer.mozilla.org"
+      description: "Web开发权威文档"
+      tags: ["learn", "reference", "web"]
+      icon:
+          type: "emoji"
+          value: "📚"
 
-  - id: "stackoverflow"
-    type: "website"
-    title: "Stack Overflow"
-    url: "https://stackoverflow.com"
-    description: "程序员问答社区"
-    tags: ["dev", "community"]
-    icon: "❓"
+    - id: "stackoverflow"
+      type: "website"
+      title: "Stack Overflow"
+      url: "https://stackoverflow.com"
+      description: "程序员问答社区"
+      tags: ["dev", "community"]
+      icon:
+          type: "emoji"
+          value: "❓"

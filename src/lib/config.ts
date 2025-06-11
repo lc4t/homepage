@@ -101,20 +101,7 @@ export function validateYamlConfig(yamlText: string): { valid: boolean; error?: 
   }
 }
 
-// 获取favicon URL
-export function getFaviconUrl(url: string, fallback?: string): string {
-  if (fallback && (fallback.startsWith('http') || fallback.startsWith('/'))) {
-    return fallback;
-  }
-  
-  try {
-    const domain = new URL(url).hostname;
-    // 使用多个favicon服务作为备选
-    return `https://icon.horse/icon/${domain}`;
-  } catch {
-    return fallback || '/favicon.ico';
-  }
-}
+// getFaviconUrl函数已移至IconComponent中
 
 // 根据时间判断是否应该使用深色主题
 export function shouldUseDarkTheme(): boolean {

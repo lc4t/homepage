@@ -1,3 +1,27 @@
+// 图标配置类型
+export interface IconConfig {
+  // 图标类型
+  type: 'auto' | 'emoji' | 'path' | 'url' | 'text' | 'favicon' | 'badge' | 'svg';
+  // 图标内容/路径
+  value?: string;
+  // SVG内容（当type为'svg'时）
+  svg?: string;
+  // Badge配置（当type为'badge'时）
+  badge?: {
+    style?: 'flat' | 'flat-square' | 'plastic' | 'for-the-badge' | 'social';
+    label?: string;
+    message?: string;
+    color?: string;
+    labelColor?: string;
+    logo?: string;
+  };
+  // 保底图标
+  fallback?: {
+    type: 'emoji' | 'text';
+    value: string;
+  };
+}
+
 // 网站配置类型
 export interface SiteConfig {
   title: string;
@@ -13,7 +37,7 @@ export interface SiteConfig {
     custom?: Array<{
       name: string;
       url: string;
-      icon?: string;
+      icon?: IconConfig | string; // 支持新的IconConfig或字符串（兼容性）
     }>;
   };
 }
@@ -92,7 +116,7 @@ interface BaseItem {
   title: string;
   description: string;
   tags: string[];
-  icon?: string;
+  icon?: IconConfig | string; // 支持新的IconConfig或字符串（兼容性）
   type: string; // 允许任意类型字符串
 }
 

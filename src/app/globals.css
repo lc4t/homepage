@@ -120,6 +120,7 @@ body {
   box-shadow: 0 8px 32px 0 var(--shadow-color);
   transition: all 0.3s ease;
   overflow: hidden;
+  min-height: 180px; /* 设置最小高度确保卡片对齐 */
 }
 
 .apple-card:hover {
