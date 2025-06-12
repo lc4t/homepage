@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Item, Config, ChecklistItemConfig, SharedListItemConfig, ServiceItem } from '@/types/config';
+import { Item, Config, ChecklistItemConfig, SharedListItemConfig, ServiceItem, ApplicationItem } from '@/types/config';
 import { HealthChecker, ChecklistManager } from '@/lib/config';
 import { useTheme } from './ThemeProvider';
 import { IconComponent } from './IconComponent';
@@ -60,7 +60,7 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
       onOpenChecklist(item);
     } else if (item.type === 'sharedlist' && onOpenSharedList) {
       onOpenSharedList(item);
-    } else if (item.type === 'website' || item.type === 'service') {
+    } else if (item.type === 'website' || item.type === 'service' || item.type === 'application') {
       const url = 'url' in item ? (item as { url: string }).url : undefined;
       if (url) {
         window.open(url, '_blank');

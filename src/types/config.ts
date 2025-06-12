@@ -146,6 +146,12 @@ export interface ServiceItem extends BaseItem {
   healthCheck?: HealthCheckConfig;
 }
 
+// 应用程序项目类型
+export interface ApplicationItem extends BaseItem {
+  type: 'application';
+  url: string;
+}
+
 // 清单项目类型
 export interface ChecklistItemConfig extends BaseItem {
   type: 'checklist';
@@ -164,7 +170,7 @@ export interface CustomItemConfig extends BaseItem {
 }
 
 // 联合项目类型
-export type Item = WebsiteItem | ServiceItem | ChecklistItemConfig | SharedListItemConfig | CustomItemConfig;
+export type Item = WebsiteItem | ServiceItem | ApplicationItem | ChecklistItemConfig | SharedListItemConfig | CustomItemConfig;
 
 // 完整配置类型
 export interface Config {

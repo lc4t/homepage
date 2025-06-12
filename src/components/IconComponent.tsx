@@ -38,8 +38,8 @@ export function IconComponent({
     setCurrentFaviconIndex(0);
   }, [icon, url]);
 
-  // 判断是否应该默认尝试favicon（对于website/service类型且未配置icon）
-  const shouldTryFavicon = (itemType === 'website' || itemType === 'service') && url && !icon;
+  // 判断是否应该默认尝试favicon（对于website/service/application类型且未配置icon）
+  const shouldTryFavicon = (itemType === 'website' || itemType === 'service' || itemType === 'application') && url && !icon;
 
   // 解析图标路径（只处理文件路径，自动添加/icons/前缀）
   const resolveIconPath = (path: string): string => {
