@@ -1,5 +1,5 @@
 import yaml from 'js-yaml';
-import { Config, ServiceStatus, ChecklistState, Item, SharedListItemConfig, ChecklistItemConfig, SharedListItem, ChecklistItem } from '@/types/config';
+import { Config, ServiceStatus, ChecklistState, Item, SharedListItemConfig, ChecklistItemConfig, SharedListItem, ChecklistItem, ServiceItem, ApplicationItem } from '@/types/config';
 
 // 默认配置
 const DEFAULT_CONFIG: Partial<Config> = {
@@ -39,6 +39,14 @@ const DEFAULT_CONFIG: Partial<Config> = {
       template: '## {tag}\n\n{items}',
       item_format: '- [{title}]({url}) - {description}',
     },
+  },
+  healthCheck: {
+    enabled: true,
+    probe: {
+      host: '127.0.0.1', // 默认使用本机作为探针
+      interval: 300, // 5分钟检查一次
+      timeout: 3 // 3秒超时
+    }
   },
   items: [],
 };
@@ -81,6 +89,14 @@ export async function loadConfig(): Promise<Config> {
         typeGroups: config.layout?.typeGroups || {},
       },
       export: { ...DEFAULT_CONFIG.export, ...config.export },
+      healthCheck: config.healthCheck ? {
+        enabled: config.healthCheck.enabled !== undefined ? config.healthCheck.enabled : DEFAULT_CONFIG.healthCheck!.enabled,
+        probe: config.healthCheck.probe ? {
+          host: config.healthCheck.probe.host || DEFAULT_CONFIG.healthCheck!.probe!.host,
+          interval: config.healthCheck.probe.interval || DEFAULT_CONFIG.healthCheck!.probe!.interval,
+          timeout: config.healthCheck.probe.timeout || DEFAULT_CONFIG.healthCheck!.probe!.timeout
+        } : DEFAULT_CONFIG.healthCheck!.probe
+      } : DEFAULT_CONFIG.healthCheck,
       items: config.items || [],
     };
     
@@ -260,6 +276,11 @@ export function exportToMarkdown(
 export class HealthChecker {
   private static checks = new Map<string, ServiceStatus>();
   private static intervals = new Map<string, number>();
+  private static probeStatus: 'online' | 'offline' | 'unknown' = 'unknown';
+  private static probeInterval: number | null = null;
+  private static globalHealthCheckEnabled: boolean = true;
+  private static statusListeners = new Map<string, Set<(status: ServiceStatus) => void>>();
+  private static currentConfig: Config | null = null;
   
   static getStatus(itemId: string): ServiceStatus {
     return this.checks.get(itemId) || {
@@ -269,10 +290,293 @@ export class HealthChecker {
     };
   }
   
-  static async checkService(url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number): Promise<'online' | 'offline'> {
+  static getProbeStatus(): 'online' | 'offline' | 'unknown' {
+    return this.probeStatus;
+  }
+  
+  static isGlobalHealthCheckEnabled(): boolean {
+    return this.globalHealthCheckEnabled;
+  }
+  
+  // 订阅服务状态更新
+  static subscribeToStatusUpdates(itemId: string, callback: (status: ServiceStatus) => void): void {
+    console.log(`[订阅] 添加 ${itemId} 的状态监听器`);
+    
+    if (!this.statusListeners.has(itemId)) {
+      this.statusListeners.set(itemId, new Set());
+    }
+    
+    const listeners = this.statusListeners.get(itemId);
+    listeners?.add(callback);
+    
+    console.log(`[订阅] ${itemId} 现在有 ${listeners?.size || 0} 个监听器`);
+    
+    // 如果已经有状态，立即通知
+    const currentStatus = this.checks.get(itemId);
+    if (currentStatus) {
+      console.log(`[订阅] ${itemId} 已有状态，立即通知新监听器:`, currentStatus);
+      try {
+        callback(currentStatus);
+      } catch (error) {
+        console.error(`[订阅] 通知监听器出错:`, error);
+      }
+    }
+  }
+  
+  // 取消订阅服务状态更新
+  static unsubscribeFromStatusUpdates(itemId: string, callback: (status: ServiceStatus) => void): void {
+    console.log(`[取消订阅] 移除 ${itemId} 的状态监听器`);
+    
+    const listeners = this.statusListeners.get(itemId);
+    if (listeners) {
+      const beforeSize = listeners.size;
+      listeners.delete(callback);
+      console.log(`[取消订阅] ${itemId} 监听器数量: ${beforeSize} -> ${listeners.size}`);
+    }
+  }
+  
+  // 通知状态更新
+  private static notifyStatusUpdate(itemId: string, status: ServiceStatus): void {
+    const listeners = this.statusListeners.get(itemId);
+    console.log(`[通知] ${itemId} 状态更新:`, status, `监听器数量: ${listeners?.size || 0}`);
+    
+    // 无论是否有监听器，都保存状态
+    this.checks.set(itemId, status);
+    
+    if (!listeners || listeners.size === 0) {
+      console.log(`[通知] ${itemId} 没有监听器，状态已保存，将在组件挂载时自动获取状态`);
+      return;
+    }
+    
+    console.log(`[通知] ${itemId} 开始通知 ${listeners.size} 个监听器`);
+    let notifiedCount = 0;
+    
+    listeners.forEach(callback => {
+      try {
+        callback(status);
+        notifiedCount++;
+      } catch (error) {
+        console.error(`Error in status listener for ${itemId}:`, error);
+      }
+    });
+    
+    console.log(`[通知] ${itemId} 成功通知了 ${notifiedCount}/${listeners.size} 个监听器`);
+  }
+  
+  // 设置初始checking状态
+  static setInitialCheckingStatus(itemId: string): void {
+    // 如果探针不可达，直接跳过
+    if (this.probeStatus === 'offline') {
+      console.log(`[${itemId}] 探针不可达，不设置初始checking状态`);
+      return;
+    }
+    
+    console.log(`[${itemId}] 设置初始checking状态`);
+    
+    // 查找服务配置，确保服务存在
+    const serviceConfig = this.findServiceConfig(itemId);
+    if (!serviceConfig) {
+      console.error(`[${itemId}] 设置初始checking状态失败: 找不到服务配置`);
+      return;
+    }
+    
+    // 创建checking状态
+    const checkingStatus: ServiceStatus = {
+      id: itemId,
+      status: 'checking',
+      lastChecked: new Date(),
+    };
+    
+    // 保存状态并通知所有监听器
+    this.checks.set(itemId, checkingStatus);
+    
+    // 打印当前所有监听器
+    const listeners = this.statusListeners.get(itemId);
+    console.log(`[${itemId}] 当前监听器数量: ${listeners?.size || 0}`);
+    
+    // 强制通知状态更新，即使没有监听器
+    this.notifyStatusUpdate(itemId, checkingStatus);
+    console.log(`[${itemId}] 已通知状态更新为checking`);
+  }
+  
+  // 执行一次服务检查
+  static async checkServiceOnce(itemId: string): Promise<void> {
+    // 如果探针不可达，直接跳过
+    if (this.probeStatus === 'offline') {
+      console.log(`[${itemId}] 探针不可达，不执行服务检查`);
+      return;
+    }
+    
+    // 查找对应的服务项配置
+    const serviceConfig = this.findServiceConfig(itemId);
+    if (!serviceConfig) {
+      console.error(`无法找到服务配置: ${itemId}`);
+      return;
+    }
+    
+    console.log(`[检查] 开始检查服务 ${itemId}`);
+    
+    // 设置状态为checking
+    const checkingStatus: ServiceStatus = {
+      id: itemId,
+      status: 'checking',
+      lastChecked: new Date(),
+    };
+    this.checks.set(itemId, checkingStatus);
+    this.notifyStatusUpdate(itemId, checkingStatus);
+    
+    // 获取服务配置
+    const url = serviceConfig.healthCheck?.url || serviceConfig.url;
+    const type = serviceConfig.healthCheck?.type || 'http';
+    const host = serviceConfig.healthCheck?.host;
+    const port = serviceConfig.healthCheck?.port;
+    
+    console.log(`[检查] ${itemId} 配置:`, { url, type, host, port });
+    
+    if (!url && !(type === 'tcp' && host && port)) {
+      console.error(`服务配置不完整: ${itemId}`);
+      return;
+    }
+    
+    // 执行检查
+    console.log(`[检查] 执行 ${itemId} 的检查`);
+    await this.performCheck(itemId, url, type, host, port);
+    console.log(`[检查] ${itemId} 检查完成`);
+  }
+  
+  // 查找服务配置
+  private static findServiceConfig(itemId: string): ServiceItem | ApplicationItem | null {
+    // 从当前配置中查找服务项
+    if (!this.currentConfig || !this.currentConfig.items) {
+      console.error(`查找服务配置失败: 当前配置为空或没有items数组`);
+      return null;
+    }
+    
+    // 查找匹配的服务或应用项
+    console.log(`[查找] 查找服务配置: ${itemId}, 当前配置中有 ${this.currentConfig.items.length} 个项目`);
+    
+    // 调试：打印所有服务和应用项的ID
+    const serviceIds = this.currentConfig.items
+      .filter(item => item.type === 'service' || item.type === 'application')
+      .map(item => item.id);
+    console.log(`[查找] 所有服务和应用项ID: ${serviceIds.join(', ')}`);
+    
+    const serviceItem = this.currentConfig.items.find(item => 
+      item.id === itemId && (item.type === 'service' || item.type === 'application')
+    ) as ServiceItem | ApplicationItem | undefined;
+    
+    if (!serviceItem) {
+      console.error(`[查找] 未找到服务配置: ${itemId}`);
+    } else {
+      console.log(`[查找] 找到服务配置: ${itemId}, 类型: ${serviceItem.type}`);
+    }
+    
+    return serviceItem || null;
+  }
+  
+  // 初始化探针检测
+  static async initProbe(config: Config): Promise<boolean> {
+    // 保存当前配置以供后续使用
+    this.currentConfig = config;
+    console.log("[配置] 保存配置到HealthChecker:", config.items.length, "个项目");
+    // 清除现有探针检测
+    if (this.probeInterval) {
+      clearInterval(this.probeInterval);
+      this.probeInterval = null;
+    }
+    
+    // 设置全局健康检查状态
+    this.globalHealthCheckEnabled = config.healthCheck?.enabled ?? true;
+    
+    // 如果未启用全局健康检查或未配置探针，则直接返回
+    if (!config.healthCheck?.enabled || !config.healthCheck.probe) {
+      this.probeStatus = 'offline'; // 设置为离线状态，这样不会启动健康检查
+      console.log("[探针] 全局健康检查未启用或未配置探针");
+      // 清除所有服务状态
+      this.checks.clear();
+      return false;
+    }
+    
+    const { host, timeout = 3 } = config.healthCheck.probe;
+    
+    console.log("[探针] 开始初始化探针检测:", host);
+    
+    // 立即执行一次探针检测并等待结果
+    await this.checkProbe(host, timeout);
+    
+    // 如果探针不可达，清除所有服务状态
+    if (this.probeStatus !== 'online') {
+      console.log("[探针] 探针不可达，清除所有服务状态");
+      this.checks.clear();
+    }
+    
+    // 不再设置定期探针检测，只在页面加载时检测一次
+    console.log("[探针] 探针状态:", this.probeStatus);
+    
+    // 返回探针状态
+    return this.probeStatus === 'online';
+  }
+  
+  // 检查探针状态
+  private static async checkProbe(host: string, timeout: number = 3): Promise<'online' | 'offline' | 'unknown'> {
     // 只在浏览器环境下运行
     if (typeof window === 'undefined') {
+      this.probeStatus = 'unknown';
+      return 'unknown';
+    }
+    
+    console.log(`[探针] 开始检测探针: ${host}`);
+    
+    // 特殊处理本地主机或localhost
+    if (host === '127.0.0.1' || host === 'localhost' || host === window.location.hostname) {
+      this.probeStatus = 'online';
+      console.log(`[探针] 探针是本地主机 (${host})，自动视为可达`);
+      return 'online';
+    }
+    
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout * 1000);
+      
+      try {
+        // 尝试连接探针主机
+        console.log(`[探针] 正在检测探针: http://${host}`);
+        await fetch(`http://${host}`, {
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: controller.signal,
+        });
+        
+        // 如果没有抛出异常，说明探针可达
+        clearTimeout(timeoutId);
+        this.probeStatus = 'online';
+        console.log(`[探针] 探针检测成功: ${host} 可达`);
+        return 'online';
+      } catch (error) {
+        clearTimeout(timeoutId);
+        
+        // 如果是CORS错误，也认为探针可达
+        if (error instanceof TypeError && error.message.includes('CORS')) {
+          this.probeStatus = 'online';
+          console.log(`[探针] 探针检测成功: ${host} 可达 (CORS)`);
+          return 'online';
+        } else {
+          this.probeStatus = 'offline';
+          console.log(`[探针] 探针检测失败: ${host} 不可达`, error);
+          return 'offline';
+        }
+      }
+    } catch (error) {
+      this.probeStatus = 'offline';
+      console.log(`[探针] 探针检测出错: ${host}`, error);
       return 'offline';
+    }
+  }
+  
+  static async checkService(url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number): Promise<{ status: 'online' | 'offline', statusCode?: number, errorMessage?: string }> {
+    // 只在浏览器环境下运行
+    if (typeof window === 'undefined') {
+      return { status: 'offline', errorMessage: 'Server-side' };
     }
     
     try {
@@ -291,33 +595,157 @@ export class HealthChecker {
           
           // 只要能连接就认为端口是开放的
           clearTimeout(timeoutId);
-          return 'online';
+          return { status: 'online', statusCode: 200 };
         } catch (error) {
-          // 如果是 CORS 错误，说明端口是开放的
+          // 如果是 CORS 错误，说明端口可能是开放的
           if (error instanceof TypeError && error.message.includes('CORS')) {
             clearTimeout(timeoutId);
-            return 'online';
+            return { status: 'online', statusCode: 0, errorMessage: 'CORS' };
           }
           // 其他错误（如连接被拒绝）说明端口未开放
           clearTimeout(timeoutId);
-          return 'offline';
+          return { 
+            status: 'offline', 
+            errorMessage: error instanceof Error ? error.message : 'Connection failed'
+          };
         }
       } else {
         // HTTP 检查
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         
-        await fetch(url, {
-          method: 'HEAD',
-          mode: 'no-cors',
-          signal: controller.signal,
-        });
+        // 记录是否需要调试日志
+        const DEBUG = true;
         
-        clearTimeout(timeoutId);
-        return 'online';
+        try {
+          // 先尝试普通模式的 HEAD 请求，这样可以获取真实状态码
+          try {
+            if (DEBUG) console.log(`尝试普通模式 HEAD 请求: ${url}`);
+            const response = await fetch(url, {
+              method: 'HEAD',
+              signal: controller.signal,
+            });
+            
+            clearTimeout(timeoutId);
+            if (DEBUG) console.log(`请求成功，状态码: ${response.status}`);
+            
+            // 获取真实状态码
+            return { 
+              status: response.ok ? 'online' : 'offline', 
+              statusCode: response.status
+            };
+          } catch (corsError) {
+            if (DEBUG) console.log(`普通模式请求失败，尝试 no-cors 模式: ${url}`, corsError);
+            
+            // 如果普通模式失败，尝试 no-cors 模式
+            await fetch(url, {
+              method: 'HEAD',
+              mode: 'no-cors',
+              signal: controller.signal,
+            });
+            
+            clearTimeout(timeoutId);
+            // 由于使用了no-cors模式，我们无法获取真实的状态码
+            // 但请求成功表示服务在线
+            if (DEBUG) console.log(`no-cors 模式请求成功，无法获取状态码`);
+            return { 
+              status: 'online', 
+              statusCode: 0,  // 使用0表示未知状态码
+              errorMessage: 'CORS限制，无法获取状态码'
+            };
+          }
+        } catch (error) {
+          if (DEBUG) console.log(`HEAD 请求失败，尝试 GET 请求: ${url}, 错误:`, error);
+          
+          // 检查是否是超时错误
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return { 
+              status: 'offline', 
+              errorMessage: 'Timeout'
+            };
+          }
+          
+          // 如果是 CORS 错误，我们认为服务可能在线
+          if (error instanceof TypeError && error.message.includes('CORS')) {
+            return { 
+              status: 'online', 
+              statusCode: 0, // 使用0表示未知状态码
+              errorMessage: 'CORS'
+            };
+          }
+          
+          // HEAD 请求失败，尝试 GET 请求
+          try {
+            const getController = new AbortController();
+            const getTimeoutId = setTimeout(() => getController.abort(), 5000);
+            
+            // 先尝试普通模式的 GET 请求
+            try {
+              if (DEBUG) console.log(`尝试普通模式 GET 请求: ${url}`);
+              const response = await fetch(url, {
+                method: 'GET',
+                signal: getController.signal,
+              });
+              
+              clearTimeout(getTimeoutId);
+              if (DEBUG) console.log(`GET 请求成功，状态码: ${response.status}`);
+              
+              // 获取真实状态码
+              return { 
+                status: response.ok ? 'online' : 'offline', 
+                statusCode: response.status
+              };
+            } catch (corsError) {
+              if (DEBUG) console.log(`普通模式 GET 请求失败，尝试 no-cors 模式: ${url}`, corsError);
+              
+              // 如果普通模式失败，尝试 no-cors 模式
+              await fetch(url, {
+                method: 'GET',
+                mode: 'no-cors',
+                signal: getController.signal,
+              });
+              
+              clearTimeout(getTimeoutId);
+              if (DEBUG) console.log(`no-cors 模式 GET 请求成功，无法获取状态码`);
+              
+              return { 
+                status: 'online', 
+                statusCode: 0,  // 使用0表示未知状态码
+                errorMessage: 'CORS限制，无法获取状态码'
+              };
+            }
+          } catch (getError) {
+            if (DEBUG) console.log(`GET 请求也失败: ${url}, 错误:`, getError);
+            
+            // 检查是否是超时错误
+            if (getError instanceof DOMException && getError.name === 'AbortError') {
+              return { 
+                status: 'offline', 
+                errorMessage: 'Timeout'
+              };
+            }
+            
+            // 如果是 CORS 错误，说明服务可能在线但有跨域限制
+            if (getError instanceof TypeError && getError.message.includes('CORS')) {
+              return { 
+                status: 'online', 
+                statusCode: 0, // 使用0表示未知状态码
+                errorMessage: 'CORS'
+              };
+            }
+            
+            return { 
+              status: 'offline', 
+              errorMessage: getError instanceof Error ? getError.message : 'Request failed'
+            };
+          }
+        }
       }
-    } catch {
-      return 'offline';
+    } catch (error) {
+      return { 
+        status: 'offline', 
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      };
     }
   }
   
@@ -335,6 +763,18 @@ export class HealthChecker {
     
     // 设置定期检查
     const intervalId = window.setInterval(() => {
+      // 检查探针状态，如果探针不可达，则设置服务状态为未知
+      if (this.probeStatus === 'offline') {
+        this.checks.set(itemId, {
+          id: itemId,
+          status: 'unknown',
+          lastChecked: new Date(),
+          errorMessage: '探针不可达，健康检查已暂停'
+        });
+        return;
+      }
+      
+      // 探针可达，正常执行检查
       this.performCheck(itemId, url, type, host, port);
     }, interval * 1000);
     
@@ -350,21 +790,33 @@ export class HealthChecker {
   }
   
   private static async performCheck(itemId: string, url: string, type: 'http' | 'tcp' = 'http', host?: string, port?: number): Promise<void> {
-    this.checks.set(itemId, {
+    // 检查探针状态，如果探针不可达，则直接返回，不做任何操作
+    if (this.probeStatus === 'offline') {
+      console.log(`[${itemId}] 探针不可达，跳过服务检查`);
+      return;
+    }
+    
+    const checkingStatus: ServiceStatus = {
       id: itemId,
       status: 'checking',
       lastChecked: new Date(),
-    });
+    };
+    this.checks.set(itemId, checkingStatus);
+    this.notifyStatusUpdate(itemId, checkingStatus);
     
     const startTime = Date.now();
-    const status = await this.checkService(url, type, host, port);
+    const result = await this.checkService(url, type, host, port);
     const responseTime = Date.now() - startTime;
     
-    this.checks.set(itemId, {
+    const newStatus: ServiceStatus = {
       id: itemId,
-      status,
+      status: result.status,
       lastChecked: new Date(),
       responseTime,
-    });
+      statusCode: result.statusCode,
+      errorMessage: result.errorMessage
+    };
+    this.checks.set(itemId, newStatus);
+    this.notifyStatusUpdate(itemId, newStatus);
   }
 }

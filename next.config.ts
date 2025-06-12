@@ -30,7 +30,8 @@ const nextConfig: NextConfig = {
   assetPrefix: '',
   
   // 构建配置
-  distDir: 'out',
+  // 开发模式使用默认的.next目录
+  distDir: process.env.NODE_ENV === 'production' ? 'out' : '.next',
   
   // 环境变量
   env: {

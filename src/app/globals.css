@@ -113,6 +113,7 @@ body {
 
 /* Apple风格卡片 */
 .apple-card {
+  position: relative;
   backdrop-filter: blur(20px) saturate(180%);
   background: var(--bg-primary);
   border: 1px solid var(--border-primary);

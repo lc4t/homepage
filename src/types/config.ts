@@ -150,6 +150,7 @@ export interface ServiceItem extends BaseItem {
 export interface ApplicationItem extends BaseItem {
   type: 'application';
   url: string;
+  healthCheck?: HealthCheckConfig;
 }
 
 // 清单项目类型
@@ -172,12 +173,23 @@ export interface CustomItemConfig extends BaseItem {
 // 联合项目类型
 export type Item = WebsiteItem | ServiceItem | ApplicationItem | ChecklistItemConfig | SharedListItemConfig | CustomItemConfig;
 
+// 全局健康检查配置
+export interface GlobalHealthCheckConfig {
+  enabled: boolean;
+  probe?: {
+    host: string;  // 探针域名或IP地址
+    interval: number; // 检查间隔（秒）
+    timeout: number; // 超时时间（秒）
+  };
+}
+
 // 完整配置类型
 export interface Config {
   site: SiteConfig;
   appearance: AppearanceConfig;
   layout: LayoutConfig;
   export: ExportConfig;
+  healthCheck?: GlobalHealthCheckConfig; // 全局健康检查配置
   items: Item[];
 }
 
@@ -185,8 +197,10 @@ export interface Config {
 export interface ServiceStatus {
   id: string;
   status: 'online' | 'offline' | 'checking' | 'unknown';
-  lastChecked: Date;
+  lastChecked: Date | string;
   responseTime?: number;
+  statusCode?: number;
+  errorMessage?: string;
 }
 
 // 清单状态类型（存储在localStorage）

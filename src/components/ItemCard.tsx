@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Item, Config, ChecklistItemConfig, SharedListItemConfig, ServiceItem, ApplicationItem } from '@/types/config';
+import { Item, Config, ChecklistItemConfig, SharedListItemConfig, ServiceItem, ApplicationItem, ServiceStatus } from '@/types/config';
 import { HealthChecker, ChecklistManager } from '@/lib/config';
 import { useTheme } from './ThemeProvider';
 import { IconComponent } from './IconComponent';
-import { CheckCircle2, XCircle, Clock, ListChecks, Share2 } from 'lucide-react';
+import { ListChecks, Share2 } from 'lucide-react';
 
 interface ItemCardProps {
   item: Item;
@@ -15,15 +15,74 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = '' }: ItemCardProps) {
+  console.log(`[${item.id}] ItemCard 渲染开始`);
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [status, setStatus] = React.useState<'online' | 'offline' | 'checking' | 'unknown'>('unknown');
   const [checklistProgress, setChecklistProgress] = React.useState<{ completed: number; total: number }>({ completed: 0, total: 0 });
+  // 添加状态来存储服务状态，而不是每次重新获取
+  const [serviceStatus, setServiceStatus] = React.useState<ServiceStatus | null>(null);
+  // 添加状态来跟踪是否应该显示健康状态
+  // 默认值根据全局健康检查状态和项目类型设置
+  const shouldShowHealth = 
+    (item.type === 'service' || item.type === 'application') && 
+    !!(item as ServiceItem | ApplicationItem).healthCheck?.enabled && 
+    HealthChecker.isGlobalHealthCheckEnabled() && 
+    HealthChecker.getProbeStatus() === 'online';
+  
+  console.log(`[${item.id}] 初始化 shouldShowHealth=${shouldShowHealth}, 
+    type=${item.type}, 
+    healthCheckEnabled=${(item.type === 'service' || item.type === 'application') ? !!(item as ServiceItem | ApplicationItem).healthCheck?.enabled : false}, 
+    globalEnabled=${HealthChecker.isGlobalHealthCheckEnabled()}, 
+    probeStatus=${HealthChecker.getProbeStatus()}`);
+  
+  const [showHealthStatus, setShowHealthStatus] = React.useState<boolean>(shouldShowHealth);
+  
+  // 健康状态更新处理函数 - 使用useCallback确保引用稳定
+  const handleStatusUpdate = React.useCallback((status: ServiceStatus) => {
+    if (item.type === 'service' || item.type === 'application') {
+      const serviceItem = item as ServiceItem | ApplicationItem;
+      console.log(`[${serviceItem.id}] 收到状态更新:`, status);
+      if (status.id === serviceItem.id) {
+        setServiceStatus(status);
+      }
+    }
+  }, [item]);
   
   // 客户端挂载检测
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // 在组件挂载时，如果是服务或应用类型，立即注册监听器
+    if ((item.type === 'service' || item.type === 'application')) {
+      const serviceItem = item as ServiceItem | ApplicationItem;
+      if (serviceItem.healthCheck?.enabled && HealthChecker.getProbeStatus() === 'online') {
+        console.log(`[${serviceItem.id}] 组件挂载时注册监听器`);
+        HealthChecker.subscribeToStatusUpdates(serviceItem.id, handleStatusUpdate);
+        
+        // 获取初始状态
+        const initialStatus = HealthChecker.getStatus(serviceItem.id);
+        console.log(`[${serviceItem.id}] 初始状态:`, initialStatus);
+        
+        // 设置初始状态
+        setServiceStatus(initialStatus);
+        
+        // 强制设置显示健康状态为true
+        if (HealthChecker.isGlobalHealthCheckEnabled()) {
+          console.log(`[${serviceItem.id}] 强制设置显示健康状态为true`);
+          setShowHealthStatus(true);
+        }
+      }
+    }
+    
+    // 清理函数
+    return () => {
+      if (item.type === 'service' || item.type === 'application') {
+        const serviceItem = item as ServiceItem | ApplicationItem;
+        console.log(`[${serviceItem.id}] 组件卸载时取消监听器`);
+        HealthChecker.unsubscribeFromStatusUpdates(serviceItem.id, handleStatusUpdate);
+      }
+    };
+  }, [item, handleStatusUpdate]);
   
   // 获取清单进度
   useEffect(() => {
@@ -41,19 +100,68 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
     }
   }, [item]);
 
-  // 获取服务状态
+  // 检查是否应该显示健康状态以及获取服务状态
   useEffect(() => {
-    if (item.type === 'service') {
-      const serviceItem = item as ServiceItem;
-      const checkStatus = () => {
-        const status = HealthChecker.getStatus(serviceItem.id);
-        setStatus(status.status);
-      };
-      checkStatus();
-      const interval = setInterval(checkStatus, 30000);
-      return () => clearInterval(interval);
+    // 只对服务和应用类型项目处理
+    if (item.type !== 'service' && item.type !== 'application') {
+      console.log(`[${item.id}] 不是服务或应用类型，不显示健康状态`);
+      setShowHealthStatus(false);
+      return;
     }
-  }, [item]);
+    
+    const serviceItem = item as ServiceItem | ApplicationItem;
+    
+    // 检查是否配置了健康检查
+    if (!serviceItem.healthCheck?.enabled) {
+      console.log(`[${serviceItem.id}] 未启用健康检查，不显示健康状态`);
+      setShowHealthStatus(false);
+      return;
+    }
+    
+    // 检查全局健康检查状态和探针状态
+    const globalHealthCheckEnabled = HealthChecker.isGlobalHealthCheckEnabled();
+    const probeStatus = HealthChecker.getProbeStatus();
+    
+    console.log(`[${serviceItem.id}] 健康检查状态:`, { 
+      globalHealthCheckEnabled, 
+      probeStatus, 
+      healthCheckEnabled: serviceItem.healthCheck?.enabled 
+    });
+    
+    // 显示条件：全局健康检查启用 且 探针可达 且 服务配置了健康检查
+    const shouldShow = globalHealthCheckEnabled && 
+      probeStatus === 'online' && 
+      serviceItem.healthCheck?.enabled;
+    
+    console.log(`[${serviceItem.id}] 是否显示健康状态:`, shouldShow, '当前探针状态:', probeStatus);
+    console.log(`[${serviceItem.id}] 详细状态: globalHealthCheckEnabled=${globalHealthCheckEnabled}, probeStatus=${probeStatus}, healthCheckEnabled=${serviceItem.healthCheck?.enabled}`);
+    
+    // 设置是否显示健康状态
+    setShowHealthStatus(shouldShow);
+    console.log(`[${serviceItem.id}] 设置showHealthStatus=${shouldShow}`);
+    
+    if (shouldShow) {
+      // 注册状态更新回调
+      console.log(`[${serviceItem.id}] 注册状态更新回调`);
+      HealthChecker.subscribeToStatusUpdates(serviceItem.id, handleStatusUpdate);
+      
+      // 获取初始状态
+      const initialStatus = HealthChecker.getStatus(serviceItem.id);
+      console.log(`[${serviceItem.id}] 初始状态:`, initialStatus);
+      
+      // 设置初始状态 - 无论是什么状态，先显示Testing徽章
+      setServiceStatus({
+        ...initialStatus,
+        status: initialStatus.status === 'unknown' ? 'checking' : initialStatus.status
+      });
+      
+      // 清理函数：取消订阅
+      return () => {
+        console.log(`[${serviceItem.id}] 取消状态更新订阅`);
+        HealthChecker.unsubscribeFromStatusUpdates(serviceItem.id, handleStatusUpdate);
+      };
+    }
+  }, [item, handleStatusUpdate]);  // 移除mounted作为依赖，避免在客户端挂载后重新执行
 
   const handleClick = () => {
     if (item.type === 'checklist' && onOpenChecklist) {
@@ -69,18 +177,86 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
   };
 
   const getStatusIndicator = () => {
-    if (item.type !== 'service') return null;
-
-    switch (status) {
-      case 'online':
-        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
-      case 'offline':
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'checking':
-        return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />;
-      default:
-        return null;
+    // 添加详细调试日志
+    console.log(`[${item.id}] 获取状态指示器:`, { 
+      showHealthStatus, 
+      serviceStatus,
+      probeStatus: HealthChecker.getProbeStatus(),
+      globalHealthCheckEnabled: HealthChecker.isGlobalHealthCheckEnabled()
+    });
+    
+    // 如果不应该显示健康状态，不显示任何徽章
+    if (!showHealthStatus) {
+      console.log(`[${item.id}] 不显示健康状态 (showHealthStatus=${showHealthStatus})`);
+      return null;
     }
+    
+    // 如果探针不可达，不显示徽章
+    if (HealthChecker.getProbeStatus() !== 'online') {
+      console.log(`[${item.id}] 探针不可达，不显示徽章 (probeStatus=${HealthChecker.getProbeStatus()})`);
+      return null;
+    }
+    
+    // 如果没有服务状态，显示Testing徽章
+    if (!serviceStatus) {
+      console.log(`[${item.id}] 没有服务状态，显示Testing徽章`);
+      return (
+        <span 
+          className="text-xs font-medium px-1.5 py-0.5 rounded-md text-white bg-yellow-500"
+          style={{ fontSize: '0.65rem', lineHeight: '1rem' }}
+        >
+          Testing
+        </span>
+      );
+    }
+    
+    // 如果状态是checking或unknown，显示Testing徽章
+    if (serviceStatus.status === 'checking' || serviceStatus.status === 'unknown') {
+      console.log(`[${item.id}] 状态为${serviceStatus.status}，显示Testing徽章`);
+      return (
+        <span 
+          className="text-xs font-medium px-1.5 py-0.5 rounded-md text-white bg-yellow-500"
+          style={{ fontSize: '0.65rem', lineHeight: '1rem' }}
+        >
+          Testing
+        </span>
+      );
+    }
+    
+    // 根据状态生成不同颜色和文本的badge
+    let badgeText = '';
+    let badgeColor = '';
+    
+    // 特殊处理CORS错误 - 显示为Running而不是CORS
+    if (serviceStatus.status === 'online' && (serviceStatus.errorMessage === 'CORS' || serviceStatus.errorMessage === 'CORS限制，无法获取状态码' || serviceStatus.statusCode === 0)) {
+      badgeText = 'Running';
+      badgeColor = 'bg-blue-500'; // 使用蓝色表示服务运行中但无法获取状态码
+    } else {
+      switch (serviceStatus.status) {
+        case 'online':
+          badgeText = serviceStatus.statusCode && serviceStatus.statusCode > 0 ? `${serviceStatus.statusCode}` : 'OK';
+          badgeColor = 'bg-green-500';
+          break;
+        case 'offline':
+          badgeText = serviceStatus.errorMessage === 'Timeout' ? 'Timeout' : 'Error';
+          badgeColor = 'bg-red-500';
+          break;
+        default:
+          console.log(`[${item.id}] 未知状态:`, serviceStatus.status);
+          return null;
+      }
+    }
+    
+    console.log(`[${item.id}] 显示徽章:`, { badgeText, badgeColor });
+    
+    return (
+      <span 
+        className={`text-xs font-medium px-1.5 py-0.5 rounded-md text-white ${badgeColor}`}
+        style={{ fontSize: '0.65rem', lineHeight: '1rem' }}
+      >
+        {badgeText}
+      </span>
+    );
   };
 
   const getProgressInfo = () => {
@@ -111,13 +287,55 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
   const cardBaseClass = "group relative backdrop-blur-[10px] rounded-xl transition-all duration-300 cursor-pointer";
   const cardClass = mounted ? `apple-card ${className}` : `${cardBaseClass} bg-white/10 border border-white/20 ${className}`;
 
+  // 在渲染前再次检查状态
+  console.log(`[${item.id}] 渲染前状态检查: showHealthStatus=${showHealthStatus}, serviceStatus=${JSON.stringify(serviceStatus)}, probeStatus=${HealthChecker.getProbeStatus()}, globalEnabled=${HealthChecker.isGlobalHealthCheckEnabled()}`);
+
+  // 根据探针状态更新showHealthStatus
+  React.useEffect(() => {
+    if ((item.type === 'service' || item.type === 'application')) {
+      const serviceItem = item as ServiceItem | ApplicationItem;
+      const probeStatus = HealthChecker.getProbeStatus();
+      
+      // 只有在探针可达且其他条件满足时才设置为true
+      if (serviceItem.healthCheck?.enabled && 
+          HealthChecker.isGlobalHealthCheckEnabled() && 
+          probeStatus === 'online' && 
+          !showHealthStatus) {
+        console.log(`[${item.id}] 探针可达，设置showHealthStatus=true`);
+        setShowHealthStatus(true);
+      } 
+      // 如果探针不可达，确保设置为false
+      else if (probeStatus !== 'online' && showHealthStatus) {
+        console.log(`[${item.id}] 探针不可达，设置showHealthStatus=false`);
+        setShowHealthStatus(false);
+      }
+    }
+  }, [item.id, item.type, showHealthStatus]);
+
   return (
     <div 
       className={cardClass}
       onClick={handleClick}
       data-theme={mounted ? theme : undefined}
+      style={{ position: 'relative' }} // 确保有相对定位
     >
       <div className="p-6 h-full flex flex-col">
+        {/* 健康状态徽章 - 绝对定位在右上角 */}
+        {/* 调试日志 */}
+        {(() => { 
+          console.log(`[${item.id}] 渲染徽章: showHealthStatus=${showHealthStatus}, type=${item.type}, healthCheckEnabled=${(item.type === 'service' || item.type === 'application') ? !!(item as ServiceItem | ApplicationItem).healthCheck?.enabled : false}`); 
+          return null; 
+        })()}
+        {/* 只有在全局探针可达时才显示徽章 */}
+        {(item.type === 'service' || item.type === 'application') && 
+         (item as ServiceItem | ApplicationItem).healthCheck?.enabled && 
+         HealthChecker.isGlobalHealthCheckEnabled() && 
+         HealthChecker.getProbeStatus() === 'online' && (
+          <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 10 }}>
+            {getStatusIndicator()}
+          </div>
+        )}
+        
         {/* 图标和标题并排 */}
         <div className="flex items-center mb-3">
           <div className="mr-3">
@@ -130,12 +348,13 @@ export function ItemCard({ item, onOpenChecklist, onOpenSharedList, className = 
             />
           </div>
           
-          <h3 className="text-white font-medium text-sm flex-grow" style={{color: 'var(--text-primary)'}}>
-            {item.title}
-          </h3>
+          <div className="flex flex-col flex-grow">
+            <h3 className="text-white font-medium text-sm" style={{color: 'var(--text-primary)'}}>
+              {item.title}
+            </h3>
+          </div>
           
           <div className="ml-2">
-            {getStatusIndicator()}
             {item.type === 'checklist' && (
               <ListChecks className="w-4 h-4 text-white/60 mt-1" style={{color: 'var(--text-tertiary)'}} />
             )}
