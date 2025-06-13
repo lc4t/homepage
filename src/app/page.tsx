@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Config, Item, ChecklistItemConfig, SharedListItemConfig, ServiceItem, ApplicationItem } from '@/types/config';
+import { Config, Item, ChecklistItemConfig, SharedListItemConfig } from '@/types/config';
 import { loadConfig, HealthChecker } from '@/lib/config';
 import { Background } from '@/components/Background';
 import { Header } from '@/components/Header';
