@@ -26,7 +26,7 @@ site:
 healthCheck:
     enabled: true
     probe:
-        host: "192.168.1.233" # 探针地址，通常是路由器IP或内网服务器
+        host: "nas.internal.sakanano.moe" # 探针地址，通常是路由器IP或内网服务器
         timeout: 1 # 超时时间（秒）
 
 # 外观配置
@@ -115,18 +115,19 @@ items:
       description: "自用的交易信号通知站"
       tags: ["交易"]
 
+    - id: "v2ex"
+      type: "website"
+      title: "V2EX"
+      url: "https://v2ex.com/"
+      description: "互联网交流社区"
+      tags: ["社区"]
+
     - id: "Skyscanner"
       type: "application"
       title: "天巡 Skyscanner"
       url: "https://www.skyscanner.com/"
       description: "航班比价和监控服务"
       tags: ["旅游"]
-      healthCheck:
-          enabled: true
-          type: "http"
-          url: "https://www.skyscanner.com/"
-          interval: 300
-          timeout: 5
     
     - id: "avherald"
       type: "website"
@@ -138,7 +139,6 @@ items:
         type: "text"
         value: "A"
         
-    
     - id: "anitabi"
       type: "website"
       title: "Anitabi"
@@ -152,6 +152,26 @@ items:
       url: "https://lab.magiconch.com/nbnhhsh/"
       description: "解释拼音首字母缩写的含义"
       tags: ["工具"]
+      icon:
+        type: "url"
+        value: "https://lab.magiconch.com/favicon.ico"
+    
+    - id: "japanese-grammar"
+      type: "website"
+      title: "日语语法快速入门"
+      url: "https://res.wokanxing.info/jpgramma/"
+      description: "Tae Kim 写的《Japanese Grammar Guide》翻译版"
+      tags: ["日语"]
+    
+    - id: "modevol"
+      type: "website"
+      title: "渐构"
+      url: "https://www.modevol.com/episode/cl3y48jqe14u401msduqabwwx"
+      description: "YJango 老师的世界模型课程，人脑和 AI 的统一"
+      icon:
+        type: "url"
+        value: "https://www.modevol.com/favicon.png"
+      tags: ["学习"]
 
     - id: "Sai2"
       type: "website"
@@ -159,7 +179,6 @@ items:
       url: "https://piv.ink/sai2/"
       description: "Sai2 安装指引"
       tags: ["绘画"]
-
 
     - id: "n8n"
       type: "service"
@@ -311,143 +330,10 @@ items:
           url: "http://macmini.internal.sakanano.moe:4000"
           timeout: 5
 
-    # 清单管理类
-    # - id: "tech-learning"
-    #   type: "checklist"
-    #   title: "技术学习清单"
-    #   description: "2024年要掌握的技术栈和工具"
-    #   tags: ["personal", "list", "tech"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "📚"
-    #   items:
-    #       - id: "react-18"
-    #         text: "学习 React 18 新特性 (Concurrent Features)"
-    #         completed: true
-    #       - id: "typescript"
-    #         text: "掌握 TypeScript 高级类型系统"
-    #         completed: true
-    #       - id: "nextjs-14"
-    #         text: "深入 Next.js 14 App Router"
-    #         completed: false
-    #       - id: "rust"
-    #         text: "学习 Rust 编程语言基础"
-    #         completed: false
-    #       - id: "webassembly"
-    #         text: "了解 WebAssembly 应用"
-    #         completed: false
-    #       - id: "kubernetes"
-    #         text: "掌握 Kubernetes 容器编排"
-    #         completed: false
-    #       - id: "tailwind"
-    #         text: "熟练使用 Tailwind CSS"
-    #         completed: true
-    #       - id: "docker"
-    #         text: "深入学习 Docker 容器技术"
-    #         completed: true
-
-    # 分享列表示例
-    # - id: "video-tutorials"
-    #   type: "sharedlist"
-    #   title: "视频教程合集"
-    #   description: "收集的各种学习视频和教程链接"
-    #   tags: ["video", "learning", "tutorial"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🎬"
-    #   items:
-    #       - id: "nextjs-course"
-    #         text: "Next.js 完整教程 - 从入门到精通"
-    #         url: "https://www.youtube.com/watch?v=843nec-IvW0"
-    #       - id: "react-hooks"
-    #         text: "React Hooks 深度解析"
-    #         url: "https://www.bilibili.com/video/BV1Ge411W7Ra"
-    #       - id: "typescript-tutorial"
-    #         text: "TypeScript 实战教程"
-    #         url: "https://space.bilibili.com/390120104/channel/seriesdetail?sid=2695077"
-    #       - id: "rust-beginner"
-    #         text: "Rust 语言入门指南"
-    #         url: "https://www.youtube.com/watch?v=5C_HPTJg5ek"
-    #       - id: "docker-kubernetes"
-    #         text: "Docker 和 Kubernetes 从零开始"
-    #         url: "https://www.bilibili.com/video/BV1Tg411P7EB"
-
-    # - id: "home-projects"
-    #   type: "checklist"
-    #   title: "家庭技术项目"
-    #   description: "需要完成的家庭智能化项目"
-    #   tags: ["personal", "list", "home"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🔧"
-    #   items:
-    #       - id: "smart-lights"
-    #         text: "安装智能灯泡和开关"
-    #         completed: true
-    #       - id: "security-camera"
-    #         text: "部署安防摄像头系统"
-    #         completed: false
-    #       - id: "backup-system"
-    #         text: "搭建自动备份系统"
-    #         completed: true
-    #       - id: "vpn-server"
-    #         text: "配置家庭VPN服务器"
-    #         completed: false
-    #       - id: "network-upgrade"
-    #         text: "升级家庭网络设备"
-    #         completed: false
-
-    # - id: "reading-list"
-    #   type: "checklist"
-    #   title: "2024阅读清单"
-    #   description: "计划阅读的技术和管理书籍"
-    #   tags: ["personal", "list", "reading"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "📖"
-    #   items:
-    #       - id: "clean-code"
-    #         text: "《Clean Code》- Robert C. Martin"
-    #         completed: true
-    #       - id: "system-design"
-    #         text: "《Designing Data-Intensive Applications》"
-    #         completed: false
-    #       - id: "rust-book"
-    #         text: "《The Rust Programming Language》"
-    #         completed: false
-    #       - id: "ddd-book"
-    #         text: "《Domain-Driven Design》"
-    #         completed: false
-    #       - id: "microservices"
-    #         text: "《Building Microservices》"
-    #         completed: true
-
-    # - id: "fitness-goals"
-    #   type: "checklist"
-    #   title: "健身目标"
-    #   description: "2024年健身和健康目标"
-    #   tags: ["personal", "list", "health"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "💪"
-    #   items:
-    #       - id: "gym-routine"
-    #         text: "建立每周3次健身房训练"
-    #         completed: true
-    #       - id: "running"
-    #         text: "每周跑步3次，每次5公里"
-    #         completed: false
-    #       - id: "weight-goal"
-    #         text: "减重10公斤"
-    #         completed: false
-    #       - id: "diet-plan"
-    #         text: "制定健康饮食计划"
-    #         completed: true
-
     - id: "resignation-checklist"
       type: "checklist"
-      title: "离职清单 1.0"
-      description: "离职注意事项"
+      title: "离职注意事项"
+      description: "打算离职或者被毕业的时候参考用"
       tags: ["工作"]
       icon:
           type: "emoji"
@@ -455,315 +341,735 @@ items:
       items:
           # 离职谈判与手续
           - id: "resignation-category"
-            text: "离职谈判与手续"
+            text: "💼 离职谈判与手续"
             completed: false
             isHeader: true
-          - id: "resignation-interview"
-            text: "离职面谈准备，了解流程时间"
+          - id: "resignation-interview-category"
+            text: "离职面谈准备"
             completed: false
             indent: 1
+          - id: "resignation-process"
+            text: "了解离职/毕业流程和时间安排"
+            completed: false
+            indent: 2
+          - id: "resignation-reason"
+            text: "准备离职原因说明，口径统一"
+            completed: false
+            indent: 2
+          - id: "rehire-impact"
+            text: "确认对回流的影响"
+            completed: false
+            indent: 2
           - id: "record-evidence"
-            text: "如有争议准备录音等证据"
+            text: "如有争议，考虑录音保存证据"
+            completed: false
+            indent: 2
+          - id: "social-insurance-category"
+            text: "社保与公积金"
             completed: false
             indent: 1
-          - id: "social-insurance"
-            text: "确认社保缴费截止时间和转移手续"
+          - id: "social-insurance-status"
+            text: "确认社保缴费情况（缓冲期/离职当月是否缴？）"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "social-insurance-transfer"
+            text: "了解社保转移手续"
+            completed: false
+            indent: 2
           - id: "housing-fund"
-            text: "办理公积金提取或转移手续"
+            text: "公积金提取或转移手续"
+            completed: false
+            indent: 2
+          - id: "transition-category"
+            text: "过渡期安排"
             completed: false
             indent: 1
-          - id: "transition-period"
-            text: "确认过渡期工作安排和到岗要求"
+          - id: "work-arrangement"
+            text: "确认是否需要到岗工作（留证据）"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "work-handover-arrangement"
+            text: "工作交接安排"
+            completed: false
+            indent: 2
+          - id: "work-evidence"
+            text: "保留工作证据，防止以旷工为由取消赔偿"
+            completed: false
+            indent: 2
 
           # 经济补偿与福利
           - id: "compensation-category"
-            text: "经济补偿与福利"
+            text: "💰 经济补偿与福利"
             completed: false
             isHeader: true
-          - id: "compensation-amount"
-            text: "确认赔偿金具体金额和计算方式"
+          - id: "compensation-confirmation-category"
+            text: "赔偿金确认"
             completed: false
             indent: 1
+          - id: "compensation-amount"
+            text: "确认具体金额和计算方式（基本工资还是总收入）"
+            completed: false
+            indent: 2
           - id: "last-working-day"
             text: "明确最后工作日期"
             completed: false
-            indent: 1
-          - id: "housing-subsidy"
-            text: "确认住房补贴发放情况"
+            indent: 2
+          - id: "agreement-signing"
+            text: "签署相关协议并保留副本"
+            completed: false
+            indent: 2
+          - id: "housing-category"
+            text: "住房相关"
             completed: false
             indent: 1
+          - id: "housing-subsidy"
+            text: "住房补贴发到什么时候"
+            completed: false
+            indent: 2
           - id: "employee-loan"
             text: "员工购房贷款转商业贷款手续"
             completed: false
+            indent: 2
+          - id: "stock-options-category"
+            text: "股票期权"
+            completed: false
             indent: 1
-          - id: "stock-options"
-            text: "了解股票期权和已归属权益处理"
+          - id: "stock-vesting"
+            text: "了解临近行权期股票处理方式"
+            completed: false
+            indent: 2
+          - id: "vested-stock"
+            text: "确认已归属股票权益"
+            completed: false
+            indent: 2
+          - id: "vacation-category"
+            text: "假期折现"
             completed: false
             indent: 1
           - id: "vacation-cash"
-            text: "年假、调休假等假期折现"
+            text: "年假、调休假折现"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "other-vacation"
+            text: "其他假期（如育儿假）补偿"
+            completed: false
+            indent: 2
 
           # 公司福利处理
           - id: "benefits-category"
-            text: "公司福利处理"
+            text: "🏢 公司福利处理"
             completed: false
             isHeader: true
-          - id: "internal-points"
-            text: "使用完毕公司内部积分和福利券"
+          - id: "internal-points-category"
+            text: "内部积分/福利券"
             completed: false
             indent: 1
+          - id: "internal-points"
+            text: "使用完毕公司内部积分"
+            completed: false
+            indent: 2
           - id: "gift-cards"
             text: "兑换购物卡、旅游卡等"
+            completed: false
+            indent: 2
+          - id: "dining-vouchers"
+            text: "餐饮券、体验券等及时使用"
+            completed: false
+            indent: 2
+          - id: "employee-benefits-category"
+            text: "员工福利"
             completed: false
             indent: 1
           - id: "annual-checkup"
             text: "预约并完成年度体检"
             completed: false
-            indent: 1
+            indent: 2
           - id: "benefit-services"
-            text: "使用福利平台免费服务"
+            text: "使用福利平台免费服务（如洁牙等）"
             completed: false
-            indent: 1
+            indent: 2
           - id: "holiday-gifts"
-            text: "确认节日礼品领取资格"
+            text: "领取节日礼品资格确认"
+            completed: false
+            indent: 2
+          - id: "exclusive-services-category"
+            text: "专属服务"
             completed: false
             indent: 1
-          - id: "employee-discounts"
-            text: "开通员工专属折扣服务"
+          - id: "express-discount"
+            text: "员工专属快递折扣服务开通"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "financial-services"
+            text: "员工专属金融服务（信用卡、贷款等）"
+            completed: false
+            indent: 2
+          - id: "consulting-points"
+            text: "咨询服务积分使用"
+            completed: false
+            indent: 2
 
           # 证明文件与材料
           - id: "documents-category"
-            text: "证明文件与材料"
+            text: "📄 证明文件与材料"
             completed: false
             isHeader: true
-          - id: "employment-certificate"
-            text: "打印在职证明、收入证明"
+          - id: "employment-certificate-category"
+            text: "在职证明"
             completed: false
             indent: 1
+          - id: "employment-certificate"
+            text: "在职证明、收入证明等打印"
+            completed: false
+            indent: 2
           - id: "resignation-certificate"
-            text: "确认离职证明模板"
+            text: "离职证明模板确认，拍照备份"
+            completed: false
+            indent: 2
+          - id: "unemployment-insurance-category"
+            text: "失业保险"
             completed: false
             indent: 1
           - id: "unemployment-insurance"
-            text: "准备失业保险申领材料"
+            text: "失业保险申领材料准备"
+            completed: false
+            indent: 2
+          - id: "document-completeness"
+            text: "相关证明文件齐全性检查"
+            completed: false
+            indent: 2
+          - id: "personal-data-category"
+            text: "个人资料"
             completed: false
             indent: 1
-          - id: "backup-documents"
-            text: "员工卡扫描件和工作证明备份"
+          - id: "employee-card-scan"
+            text: "员工卡高清扫描件保存"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "work-proof-backup"
+            text: "工作证明材料备份"
+            completed: false
+            indent: 2
 
           # 趁在职办理事项
           - id: "opportunity-category"
-            text: "趁在职办理事项"
+            text: "🔄 趁在职办理事项"
             completed: false
             isHeader: true
+          - id: "financial-services-category"
+            text: "金融服务"
+            completed: false
+            indent: 1
           - id: "credit-cards"
-            text: "申请信用卡和员工专属贷款"
+            text: "信用卡申请"
+            completed: false
+            indent: 2
+          - id: "employee-loans"
+            text: "员工专属贷款额度申请（如需）"
+            completed: false
+            indent: 2
+          - id: "bank-accounts"
+            text: "银行卡开户服务"
+            completed: false
+            indent: 2
+          - id: "visa-documents-category"
+            text: "签证与证件"
             completed: false
             indent: 1
           - id: "visa-application"
-            text: "利用在职身份申请签证"
+            text: "签证申请（利用在职身份）"
+            completed: false
+            indent: 2
+          - id: "other-certificates"
+            text: "其他需要在职证明的证件办理"
+            completed: false
+            indent: 2
+          - id: "platform-verification-category"
+            text: "平台认证"
             completed: false
             indent: 1
-          - id: "bank-accounts"
-            text: "办理银行卡开户服务"
+          - id: "social-platform-verification"
+            text: "职场社交平台员工身份认证"
             completed: false
-            indent: 1
-          - id: "platform-verification"
-            text: "完成职场社交平台员工认证"
+            indent: 2
+          - id: "professional-certification"
+            text: "专业平台认证保留"
             completed: false
-            indent: 1
+            indent: 2
+          - id: "enterprise-cooperation"
+            text: "企业合作类开通，如航司、快递"
+            completed: false
+            indent: 2
 
           # 物品与纪念品
           - id: "items-category"
-            text: "物品与纪念品"
+            text: "🎁 物品与纪念品"
             completed: false
             isHeader: true
-          - id: "office-supplies"
-            text: "清理办公用品和个人物品"
+          - id: "company-items-category"
+            text: "公司物品"
+            completed: false
+            indent: 1
+          - id: "personal-nameplate"
+            text: "座位名牌等个人物品"
+            completed: false
+            indent: 2
+          - id: "access-card-accessories"
+            text: "工卡带等配件"
+            completed: false
+            indent: 2
+          - id: "equipment-handling-category"
+            text: "设备处理"
             completed: false
             indent: 1
           - id: "equipment-ownership"
-            text: "申请电脑设备归属"
+            text: "电脑设备是否可申请归属个人"
+            completed: false
+            indent: 2
+          - id: "other-equipment"
+            text: "其他办公设备处理"
+            completed: false
+            indent: 2
+          - id: "memorial-items-category"
+            text: "纪念意义"
             completed: false
             indent: 1
           - id: "souvenirs"
-            text: "收集工作纪念品"
+            text: "工作纪念品收集"
             completed: false
-            indent: 1
+            indent: 2
           - id: "workplace-photos"
-            text: "办公环境拍照留念"
+            text: "办公环境拍照留念/VLog（注意申请许可）"
             completed: false
-            indent: 1
+            indent: 2
 
           # 内部沟通
           - id: "communication-category"
-            text: "内部沟通"
+            text: "📢 内部沟通"
             completed: false
             isHeader: true
+          - id: "farewell-category"
+            text: "离职告别"
+            completed: false
+            indent: 1
           - id: "farewell-message"
-            text: "发布离职感言和感谢"
+            text: "内部论坛/群组发布离职感言/投诉/发泄/感谢/建议"
+            completed: false
+            indent: 2
+          - id: "contact-info"
+            text: "留下联系方式（可选）"
+            completed: false
+            indent: 2
+          - id: "work-handover-category"
+            text: "工作交接"
             completed: false
             indent: 1
-          - id: "work-handover"
-            text: "完成项目交接文档"
+          - id: "handover-documents"
+            text: "项目交接文档整理"
             completed: false
-            indent: 1
+            indent: 2
           - id: "contact-transfer"
-            text: "移交重要联系人信息"
+            text: "重要联系人信息移交"
             completed: false
-            indent: 1
+            indent: 2
           - id: "account-handover"
-            text: "移交账号权限"
+            text: "账号权限移交"
             completed: false
-            indent: 1
+            indent: 2
 
           # 注意事项
           - id: "notes-category"
-            text: "注意事项"
+            text: "⚠️ 注意事项"
             completed: false
             isHeader: true
+          - id: "legal-protection-category"
+            text: "法律保护"
+            completed: false
+            indent: 1
           - id: "document-copies"
             text: "保留所有离职相关文件副本"
             completed: false
-            indent: 1
+            indent: 2
           - id: "legal-evidence"
-            text: "妥善保存录音截图等证据"
+            text: "录音、截图等证据妥善保存"
+            completed: false
+            indent: 2
+          - id: "labor-rights"
+            text: "了解劳动法相关权益"
+            completed: false
+            indent: 2
+          - id: "confidentiality-category"
+            text: "保密协议"
             completed: false
             indent: 1
           - id: "confidentiality"
             text: "确认保密协议条款"
             completed: false
-            indent: 1
-          - id: "rehire-policy"
-            text: "了解离职对将来重新入职的影响"
+            indent: 2
+          - id: "information-security"
+            text: "避免泄露公司机密信息，离职期不要随便访问内网和拷贝"
+            completed: false
+            indent: 2
+
+    - id: "travel-checklist"
+      type: "checklist"
+      title: "旅游出门检查单"
+      description: "旅游出门前后，检查清单"
+      tags: ["旅游"]
+      icon:
+        type: "emoji"
+        value: "🛫"
+      items:
+          - id: "pre-travel-category"
+            text: "✈️ 出行前准备（~出发当天）"
+            completed: false
+            isHeader: true
+          
+          - id: "travel-prepare"
+            text: "旅行准备"
             completed: false
             indent: 1
 
-    # - id: "hierarchical-checklist"
-    #   type: "checklist"
-    #   title: "分层清单示例"
-    #   description: "展示如何使用小标题功能的清单示例"
-    #   tags: ["示例"]
-    #   icon:
-    #     type: "emoji"
-    #     value: "📋"
-    #   items:
-    #       # 第一个小标题
-    #       - id: "header-1"
-    #         text: "主要任务一"
-    #         completed: false
-    #         isHeader: true
+          - id: "japan-visa-expiry"
+            text: "有效身份证、护照"
+            completed: false
+            indent: 2
+          - id: "entry-code"
+            text: "入境许可（如需）"
+            completed: false
+            indent: 2
+          - id: "visa-expiry"
+            text: "途径地、目标地签注/VISA许可且未到期"
+            completed: false
+            indent: 2
+          
+          - id: "target-essentials-category"
+            text: "目标地注意事项"
+            completed: false
+            indent: 1
+          - id: "check-weather"
+            text: "查看天气"
+            completed: false
+            indent: 2
+          - id: "reserve-money"
+            text: "预约取现（外币）"
+            completed: false
+            indent: 2
+          - id: "sim-card"
+            text: "sim卡（境外如需）"
+            completed: false
+            indent: 2
 
-    #       # 第一个小标题下的任务
-    #       - id: "sub-task-1-1"
-    #         text: "子任务 1.1"
-    #         completed: false
-    #         indent: 1
-    #       - id: "sub-task-1-2"
-    #         text: "子任务 1.2"
-    #         completed: false
-    #         indent: 1
+          - id: "move-care"
+            text: "路上消遣"
+            completed: false
+            indent: 1
+          - id: "charge-devices"
+            text: "设备充电"
+            completed: false
+            indent: 2
+          - id: "travel-videos"
+            text: "路上的视频"
+            completed: false
+            indent: 2
 
-    #       # 第二个小标题下的子任务
-    #       - id: "header-1-2"
-    #         text: "子任务 1.2 的详细步骤"
-    #         completed: false
-    #         isHeader: true
-    #         indent: 1
-    #       - id: "sub-sub-task-1-2-1"
-    #         text: "子子任务 1.2.1"
-    #         completed: false
-    #         indent: 2
-    #       - id: "sub-sub-task-1-2-2"
-    #         text: "子子任务 1.2.2"
-    #         completed: false
-    #         indent: 2
+          - id: "pet-care"
+            text: "宠物照顾"
+            completed: false
+            indent: 1
+          - id: "change-water"
+            text: "宠物饮水机换水"
+            completed: false
+            indent: 2
+          - id: "refill-cat-food"
+            text: "宠物粮桶补粮"
+            completed: false
+            indent: 2
+          - id: "cat-litter-box"
+            text: "猫砂盆清理、加猫砂"
+            completed: false
+            indent: 2
+          - id: "cat-sitter"
+            text: "预约宠物上门"
+            completed: false
+            indent: 2
+         
+          
+          - id: "on-travel-category"
+            text: "🏠 出行前注意（=出发当天）"
+            completed: false
+            isHeader: true
+          
+          - id: "home-care"
+            text: "家中整理"
+            completed: false
+            indent: 1
+          - id: "open-curtains"
+            text: "拉开窗帘"
+            completed: false
+            indent: 2
+          - id: "collect-clothes"
+            text: "收衣服"
+            completed: false
+            indent: 2
+          - id: "camera-check"
+            text: "摄像头检查"
+            completed: false
+            indent: 2
 
-    #       # 第二个主要小标题
-    #       - id: "header-2"
-    #         text: "主要任务二"
-    #         completed: false
-    #         isHeader: true
+          - id: "safety-category"
+            text: "安全措施"
+            completed: false
+            indent: 1
+          - id: "airtag-luggage"
+            text: "行李、背包、挎包放Airtag和防丢绳"
+            completed: false
+            indent: 2
+          - id: "travel-insurance"
+            text: "出行保险（如需）"
+            completed: false
+            indent: 2
 
-    #       # 第二个主要小标题下的任务
-    #       - id: "sub-task-2-1"
-    #         text: "子任务 2.1"
-    #         completed: false
-    #         indent: 1
-    #       - id: "sub-task-2-2"
-    #         text: "子任务 2.2"
-    #         completed: false
-    #         indent: 1
 
-    # 设计和创意工具
-    # - id: "figma"
-    #   type: "website"
-    #   title: "Figma"
-    #   url: "https://figma.com"
-    #   description: "协作式UI设计工具"
-    #   tags: ["design", "tool"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🎯"
+          - id: "luggage-documents-category"
+            text: "行李检查: 随身包"
+            completed: false
+            indent: 1
+          - id: "passport"
+            text: "护照"
+            completed: false
+            indent: 2
+          - id: "id-card"
+            text: "身份证"
+            completed: false
+            indent: 2
+          - id: "credit-cards"
+            text: "信用卡（建议>=2张，建议至少带一张visa卡）"
+            completed: false
+            indent: 2
+          - id: "debit-card"
+            text: "储蓄卡"
+            completed: false
+            indent: 2
+          - id: "stamp-book"
+            text: "盖章本（如需）"
+            completed: false
+            indent: 2
 
-    # - id: "bing"
-    #   type: "website"
-    #   title: "Bing"
-    #   url: "https://www.bing.com"
-    #   description: "微软搜索引擎和每日精美壁纸"
-    #   tags: ["design", "photo"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "📸"
+          - id: "luggage-electronics-category"
+            text: "行李检查: 数码设备"
+            completed: false
+            indent: 1
+          - id: "charging-hub"
+            text: "充电HUB"
+            completed: false
+            indent: 2
+          - id: "typec-cables"
+            text: "TYPEC 线x2"
+            completed: false
+            indent: 2
+          - id: "lightning-cable"
+            text: "lightning线（如需）"
+            completed: false
+            indent: 2
+          - id: "applewatch-cable"
+            text: "applewatch线（如需）"
+            completed: false
+            indent: 2
+          - id: "laptop"
+            text: "电脑（如需）"
+            completed: false
+            indent: 2
+          - id: "ipad"
+            text: "iPad mini（建议带）"
+            completed: false
+            indent: 2
+          - id: "ipad-stand"
+            text: "iPad支架（如需，如果你带的是iPad Pro，建议带）"
+            completed: false
+            indent: 2
+          - id: "earphones"
+            text: "耳机"
+            completed: false
+            indent: 2
+          - id: "power-bank"
+            text: "充电宝"
+            completed: false
+            indent: 2
+          - id: "power-adapter"
+            text: "转换头（如需）"
+            completed: false
+            indent: 2
+          - id: "camera"
+            text: "相机"
+            completed: false
+            indent: 2
+          - id: "camera-lens"
+            text: "镜头"
+            completed: false
+            indent: 2
+          - id: "cpl-filter"
+            text: "CPL滤镜（如需）"
+            completed: false
+            indent: 2
+          - id: "camera-battery"
+            text: "相机电池+电池仓（如需）"
+            completed: false
+            indent: 2
 
-    # 生产力工具
-    # - id: "notion"
-    #   type: "website"
-    #   title: "Notion"
-    #   url: "https://notion.so"
-    #   description: "All-in-one 工作空间"
-    #   tags: ["tool", "productivity"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "📋"
+          - id: "luggage-daily-items-category"
+            text: "行李检查: 生活用品"
+            completed: false
+            indent: 1
+          - id: "neck-pillow"
+            text: "颈枕（其实不太建议，不方便携带）"
+            completed: false
+            indent: 2
+          - id: "comb"
+            text: "梳子"
+            completed: false
+            indent: 2
+          - id: "razor"
+            text: "剃须刀"
+            completed: false
+            indent: 2
+          - id: "nail-clipper"
+            text: "指甲剪"
+            completed: false
+            indent: 2
+          - id: "electric-toothbrush"
+            text: "电动牙刷"
+            completed: false
+            indent: 2
+          - id: "toothpaste"
+            text: "牙膏"
+            completed: false
+            indent: 2
+          - id: "dirty-clothes-bags"
+            text: "脏衣收纳袋xN"
+            completed: false
+            indent: 2
+          - id: "trash-bags"
+            text: "车载垃圾袋xN"
+            completed: false
+            indent: 2
+          - id: "masks"
+            text: "口罩x天数x2（也可以现地买）"
+            completed: false
+            indent: 2
+          - id: "face-wash"
+            text: "洗脸工具"
+            completed: false
+            indent: 2
+          - id: "face-masks"
+            text: "护肤、化妆工具（如需）"
+            completed: false
+            indent: 2
+          - id: "pajamas"
+            text: "睡衣"
+            completed: false
+            indent: 2
+          - id: "umbrella"
+            text: "伞"
+            completed: false
+            indent: 2
+          - id: "medicine"
+            text: "药（注意海关要求，没刚需不建议带）"
+            completed: false
+            indent: 2
+          - id: "contraceptive"
+            text: "计生用品（如需）"
+            completed: false
+            indent: 2
+          - id: "clips"
+            text: "夹子（如需，夹单据等）"
+            completed: false
+            indent: 2
+          - id: "tissues"
+            text: "纸巾"
+            completed: false
+            indent: 2
+          - id: "wet-wipes"
+            text: "湿巾"
+            completed: false
+            indent: 2
+          - id: "dental-floss"
+            text: "牙线"
+            completed: false
+            indent: 2
+          - id: "sunscreen"
+            text: "防晒用品"
+            completed: false
+            indent: 2
 
-    # - id: "raycast"
-    #   type: "website"
-    #   title: "Raycast"
-    #   url: "https://raycast.com"
-    #   description: "macOS 效率启动器"
-    #   tags: ["tool", "productivity", "mac"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "🚀"
+          - id: "luggage-clothing-category"
+            text: "行李检查: 衣服"
+            completed: false
+            indent: 1
+          - id: "disposable-towels"
+            text: "一次性毛巾xN"
+            completed: false
+            indent: 2
+          - id: "disposable-underwear"
+            text: "（一次性）内裤xN"
+            completed: false
+            indent: 2
+          - id: "socks"
+            text: "袜子xN"
+            completed: false
+            indent: 2
+          - id: "jacket"
+            text: "外套"
+            completed: false
+            indent: 2
+          - id: "gloves"
+            text: "手套（如果很冷）"
+            completed: false
+            indent: 2
+          - id: "t-shirts"
+            text: "上衣/T恤等 xN"
+            completed: false
+            indent: 2
+          - id: "pants"
+            text: "下衣/短裤/裤子等 xN"
+            completed: false
+            indent: 2
 
-    # 学习资源
-    # - id: "mdn"
-    #   type: "website"
-    #   title: "MDN Web Docs"
-    #   url: "https://developer.mozilla.org"
-    #   description: "Web开发权威文档"
-    #   tags: ["learn", "reference", "web"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "📚"
+          - id: "post-travel-category"
+            text: "🏠 回来后要做的收尾"
+            completed: false
+            isHeader: true
+          - id: "cat-status-check"
+            text: "宠物状态检查"
+            completed: false
+            indent: 1
+          - id: "give-cat-food"
+            text: "宠物奖励（好久没见，给罐头）"
+            completed: false
+            indent: 1
+          - id: "dirty-laundry"
+            text: "脏衣服处理"
+            completed: false
+            indent: 1
+          - id: "expense-reconciliation"
+            text: "账单整理"
+            completed: false
+            indent: 1
+          - id: "souvenirs-organization"
+            text: "纪念品整理"
+            completed: false
+            indent: 1
+    
+    - id: "book-tutorials"
+      type: "sharedlist"
+      title: "阅读书单分享"
+      description: "收集的各种书的阅读记录和待读"
+      tags: ["阅读"]
+      icon:
+          type: "emoji"
+          value: "📚"
+      items:
+          - id: "book-list"
+            text: "阅读书单（跳转到腾讯文档）"
+            url: "https://docs.qq.com/sheet/DR09SbW1YVURGQ2dK"
 
-    # - id: "stackoverflow"
-    #   type: "website"
-    #   title: "Stack Overflow"
-    #   url: "https://stackoverflow.com"
-    #   description: "程序员问答社区"
-    #   tags: ["dev", "community"]
-    #   icon:
-    #       type: "emoji"
-    #       value: "❓"

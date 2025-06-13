@@ -32,12 +32,7 @@ export default function HomePage() {
         console.log("加载的配置:", loadedConfig);
         console.log("类型分组配置:", loadedConfig.layout.typeGroups);
         
-        // 如果没有明确设置探针主机，则使用当前主机名
-        if (loadedConfig.healthCheck?.probe && 
-            (!loadedConfig.healthCheck.probe.host || loadedConfig.healthCheck.probe.host === '127.0.0.1')) {
-          loadedConfig.healthCheck.probe.host = window.location.hostname;
-          console.log(`自动设置探针主机为当前主机: ${loadedConfig.healthCheck.probe.host}`);
-        }
+        // 保持探针主机配置不变，让 HealthChecker 自己处理
         
         setConfig(loadedConfig);
         setFilteredItems(loadedConfig.items);
@@ -58,85 +53,24 @@ export default function HomePage() {
     
     console.log("背景图片已加载，开始执行健康检查...");
 
-    // 初始化探针检测，然后根据探针状态决定是否启动服务健康检查
+    // 初始化健康检查系统
     const initHealthChecks = async () => {
-      console.log("开始初始化健康检查...");
-      
-      // 初始化探针并等待结果
-      const probeOnline = await HealthChecker.initProbe(config);
-      
-      // 如果探针不可达，则不启动服务健康检查
-      if (!probeOnline) {
-        console.log("探针不可达，不执行健康检查");
-        return;
+      try {
+        console.log("开始初始化健康检查系统...");
+        
+        // 使用 HealthChecker.initialize 方法初始化整个系统
+        await HealthChecker.initialize(config);
+        
+        console.log("健康检查系统初始化完成");
+        
+      } catch (error) {
+        console.error('健康检查初始化失败:', error);
       }
-      
-      console.log("探针可达，启动服务健康检查");
-      
-      // 延迟一点时间，确保组件已经挂载并注册了监听器
-      setTimeout(() => {
-        // 再次检查探针状态，确保在执行检查前探针仍然可达
-        if (HealthChecker.getProbeStatus() !== 'online') {
-          console.log("预处理前探针已不可达，取消服务检查");
-          return;
-        }
-        
-        // 只有探针可达时，才对每个服务项执行检查
-        console.log("开始处理服务项...");
-        let serviceCount = 0;
-        
-        // 先预处理所有服务项，设置为checking状态
-        config.items.forEach(item => {
-          if (item.type === 'service' || item.type === 'application') {
-            // 检查是否有健康检查配置
-            const serviceItem = item as ServiceItem | ApplicationItem;
-            if (serviceItem.healthCheck?.enabled) {
-              serviceCount++;
-              console.log(`预处理服务项 ${serviceCount}: ${serviceItem.id}`);
-              
-              // 先设置为checking状态，以便显示Testing徽章
-              console.log(`设置 ${serviceItem.id} 为checking状态`);
-              HealthChecker.setInitialCheckingStatus(serviceItem.id);
-            }
-          }
-        });
-        
-        console.log(`共预处理了 ${serviceCount} 个服务项`);
-        
-        // 再延迟一点时间，确保组件已经注册了监听器
-        setTimeout(() => {
-          // 再次检查探针状态，确保在执行检查前探针仍然可达
-          if (HealthChecker.getProbeStatus() !== 'online') {
-            console.log("执行检查前探针已不可达，取消服务检查");
-            return;
-          }
-          
-          console.log("开始执行服务检查...");
-          let checkCount = 0;
-          
-          // 然后执行检查
-          config.items.forEach(item => {
-            if (item.type === 'service' || item.type === 'application') {
-              // 检查是否有健康检查配置
-              const serviceItem = item as ServiceItem | ApplicationItem;
-              if (serviceItem.healthCheck?.enabled) {
-                checkCount++;
-                // 执行一次性检查
-                console.log(`执行服务检查 ${checkCount}: ${serviceItem.id}`);
-                HealthChecker.checkServiceOnce(serviceItem.id);
-              }
-            }
-          });
-          
-          console.log(`共执行了 ${checkCount} 个服务检查`);
-        }, 2000); // 延迟2000ms执行检查，给组件更多时间注册监听器
-      }, 1000); // 延迟1000ms执行，确保组件已经挂载
     };
     
     // 执行初始化
     initHealthChecks();
     
-    // 不需要清理函数，因为我们不再使用定时器
   }, [config, backgroundLoaded]);
 
   const handleOpenChecklist = (item: Item) => {
