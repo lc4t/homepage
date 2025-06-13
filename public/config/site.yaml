@@ -172,6 +172,16 @@ items:
         type: "url"
         value: "https://www.modevol.com/favicon.png"
       tags: ["学习"]
+    
+    - id: "sheyingps"
+      type: "website"
+      title: "橘子素材"
+      url: "https://sheyingps.com"
+      description: "摄影资源站，一些 APP、素材下载"
+      tags: ["摄影"]
+      icon:
+        type: "emoji"
+        value: "📷"
 
     - id: "Sai2"
       type: "website"
