@@ -506,6 +506,9 @@ export class HealthChecker {
   
   // 检查探针状态
   private static async checkProbe(host: string, timeout: number = 3): Promise<void> {
+    // host的请求协议，使用当前页面加载的实际协议
+    const schema = window.location.protocol; // http:
+    console.log(`[探针] 当前页面加载的实际协议: ${schema}`);
     console.log(`[探针] 开始检测探针: ${host}`);
     
     // 特殊处理本地主机
@@ -533,7 +536,7 @@ export class HealthChecker {
       const timeoutId = setTimeout(() => controller.abort(), timeout * 1000);
       
       // 尝试ping探针主机
-      await fetch(`http://${host}`, {
+      await fetch(`${schema}//${host}`, {
         method: 'HEAD',
         mode: 'no-cors',
         signal: controller.signal,
