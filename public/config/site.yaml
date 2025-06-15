@@ -108,6 +108,26 @@ items:
       description: "当前最好用的代码、数据分析 AI 工具"
       tags: ["AI"]
     
+    - id: "memo"
+      type: "application"
+      title: "MemoAI"
+      url: "https://memo.ac/zh/"
+      description: "语音视频转文字和总结工具"
+      tags: ["笔记", "AI"]
+      icon:
+        type: "url"
+        value: "https://vip2.loli.io/2023/08/12/jtziym7orAeLdKg.png"
+    
+    - id: "heptabase"
+      type: "application"
+      title: "Heptabase"
+      url: "https://heptabase.com/"
+      description: "画布类笔记应用，适合做主题研究"
+      tags: ["笔记"]
+      icon:
+        type: "url"
+        value: "https://heptabase.com/assets/images/favicon.png"
+    
     - id: "anytype"
       type: "application"
       title: "Anytype"
