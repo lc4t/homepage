@@ -167,6 +167,13 @@ items:
       url: "https://www.skyscanner.com/"
       description: "航班比价和监控服务"
       tags: ["旅游"]
+    
+    - id: "SimplyPiano"
+      type: "application"
+      title: "SimplyPiano"
+      url: "https://www.hellosimply.com/"
+      description: "在iPad上练习钢琴的工具"
+      tags: ["音乐"]
 
     - id: "trading-test"
       type: "website"
@@ -174,6 +181,13 @@ items:
       url: "https://trading.sakanano.moe"
       description: "自用的交易信号通知站"
       tags: ["交易"]
+    
+    - id: "caixin"
+      type: "website"
+      title: "财新网"
+      url: "https://www.caixin.com/"
+      description: "国内最权威的财经金融媒体网站"
+      tags: ["新闻"]
 
     - id: "v2ex"
       type: "website"
@@ -191,7 +205,9 @@ items:
       icon:
         type: "text"
         value: "A"
-        
+        # type: "url"
+        # value: "https://avherald.com/favicon.ico" # 好像经常访问不了
+
     - id: "anitabi"
       type: "website"
       title: "Anitabi"
@@ -1109,7 +1125,7 @@ items:
     
     - id: "book-tutorials"
       type: "sharedlist"
-      title: "阅读书单分享"
+      title: "阅读书单"
       description: "收集的各种书的阅读记录和待读"
       tags: ["阅读"]
       icon:
@@ -1120,3 +1136,24 @@ items:
             text: "阅读书单（跳转到腾讯文档）"
             url: "https://docs.qq.com/sheet/DR09SbW1YVURGQ2dK"
 
+    - id: "newsletter"
+      type: "sharedlist"
+      title: "Newsletter订阅"
+      description: "高质量的Newsletter，提供独立视角"
+      tags: ["阅读"]
+      icon:
+          type: "emoji"
+          value: "📩"
+      items:
+        - id: "AIGCWeekly"
+          text: "AIGCWeekly"
+          url: "https://www.xiaobot.net/p/guizangNews?refer=a6320472-d81a-44cd-a966-0a587bfb456f"
+        - id: "LambdaReading"
+          text: "Λ-Reading"
+          url: "https://rizi.notion.site/Reading-d77be691eb244db0b8add646b6ef7f3b"
+        - id: "Newslab"
+          text: "新闻实验室"
+          url: "https://newsletter.newslab.info/about/"
+        - id: "flomo-weekly"
+          text: "小信号 by flomo"
+          url: "https://read.flomoapp.com/weekly/"
