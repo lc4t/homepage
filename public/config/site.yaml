@@ -1157,3 +1157,16 @@ items:
         - id: "flomo-weekly"
           text: "小信号 by flomo"
           url: "https://read.flomoapp.com/weekly/"
+
+    - id: "shared-ppt"
+      type: "sharedlist"
+      title: "PPT分享"
+      description: "个人做过的主题分享，PPT公开版"
+      tags: ["信息"]
+      icon:
+          type: "emoji"
+          value: "📊"
+      items:
+        - id: "investment"
+          text: "宏观经济和投资入门"
+          url: "https://investment.sakanano.moe/"
