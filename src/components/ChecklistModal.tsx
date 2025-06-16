@@ -105,7 +105,7 @@ ${pendingGroup.map(subItem => {
 }).join('\n')}
 
 ---
-导出时间: ${new Date().toLocaleString()}
+导出时间: ${new Date().toLocaleString()}，点此查看原文：https://homepage.sakanano.moe/
 `;
 
     // 复制到剪贴板
