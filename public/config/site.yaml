@@ -160,6 +160,15 @@ items:
           host: "127.0.0.1"
           port: 6152
           timeout: 3
+    - id: "eagle"
+      type: "application"
+      title: "Eagle"
+      url: "https://eagle.cool/"
+      description: "图片收集工具"
+      tags: ["笔记"]
+      icon:
+        type: "url"
+        value: "https://eagle.cool/images/favicon.png"
 
     - id: "Skyscanner"
       type: "application"
