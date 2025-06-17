@@ -18,25 +18,46 @@ export function SharedListModal({ item, onClose }: SharedListModalProps) {
     if (!item) return;
     
     const links = item.items.map(listItem => `${listItem.text}: ${listItem.url}`).join('\n');
-    navigator.clipboard.writeText(links)
+    const content = `${links}\n\n---
+导出时间: ${new Date().toLocaleString()}，点此查看原文：https://homepage.sakanano.moe/`;
+    navigator.clipboard.writeText(content)
       .then(() => {
-        alert('所有链接已复制到剪贴板');
+        showToast('所有链接已复制到剪贴板');
       })
       .catch(err => {
         console.error('复制失败:', err);
-        alert('复制失败，请手动复制');
+        showToast('复制失败，请手动复制', 'error');
       });
   };
 
   // 复制单个链接到剪贴板
   const handleCopyLink = (url: string) => {
-    navigator.clipboard.writeText(url)
+    const content = `${url}\n\n---
+导出时间: ${new Date().toLocaleString()}，点此查看原文：https://homepage.sakanano.moe/`;
+    navigator.clipboard.writeText(content)
       .then(() => {
-        // 可以添加一些视觉反馈，比如短暂显示一个提示
+        showToast('链接已复制到剪贴板');
       })
       .catch(err => {
         console.error('复制失败:', err);
+        showToast('复制失败，请手动复制', 'error');
       });
+  };
+
+  // 显示提示框
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-white text-sm z-50 ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0');
+      toast.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => document.body.removeChild(toast), 500);
+    }, 2000);
   };
 
   return (
