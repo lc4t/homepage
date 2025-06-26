@@ -204,7 +204,17 @@ items:
       url: "https://v2ex.com/"
       description: "互联网交流社区"
       tags: ["社区"]
-    
+
+    - id: "untools"
+      type: "website"
+      title: "untools"
+      url: "https://untools.co/"
+      description: "思考方法合集"
+      tags: ["信息"]
+      icon:
+        type: "url"
+        value: "https://untools.co/favicon-32x32.png"
+
     - id: "avherald"
       type: "website"
       title: "航空先驱报"
