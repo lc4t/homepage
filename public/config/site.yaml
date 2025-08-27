@@ -170,10 +170,10 @@ items:
         type: "url"
         value: "https://eagle.cool/images/favicon.png"
 
-    - id: "Skyscanner"
+    - id: "Google Flight"
       type: "application"
-      title: "天巡 Skyscanner"
-      url: "https://www.skyscanner.com/"
+      title: "Google出行"
+      url: "https://www.google.com/travel/flights"
       description: "航班比价和监控服务"
       tags: ["旅游"]
     
